@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [Dev, main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, types & unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:unit
+
+  integration-e2e:
+    name: Integration & end-to-end tests
+    runs-on: ubuntu-latest
+    needs: checks
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: orack
+          POSTGRES_PASSWORD: orack
+          POSTGRES_DB: orack_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U orack"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://orack:orack@localhost:5432/orack_test
+      E2E_DATABASE_URL: postgresql://orack:orack@localhost:5432/orack_e2e_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Create e2e database
+        run: PGPASSWORD=orack psql -h localhost -U orack -d orack_test -c "CREATE DATABASE orack_e2e_test"
+      - run: npm run test:integration
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7

@@ -1,0 +1,402 @@
+// ORACK database schema — Neon PostgreSQL via Prisma ORM 7.
+// Money is stored as Decimal(10, 2) in LKR. Order items keep snapshots of
+// product name, variant and unit price so history survives catalogue edits.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ──────────────────────────────────────────────────────────────────
+
+enum Role {
+  OWNER
+  ADMIN
+  STAFF
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+}
+
+enum OrderStatus {
+  PENDING
+  CONTACTED
+  CONFIRMED
+  PROCESSING
+  READY_FOR_DELIVERY
+  DISPATCHED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAYMENT_PENDING
+  PAID
+  REFUNDED
+}
+
+enum CustomizationStatus {
+  NEW_REQUEST
+  UNDER_REVIEW
+  QUOTATION_PREPARED
+  AWAITING_CUSTOMER_CONFIRMATION
+  ACCEPTED
+  REJECTED
+  CONVERTED_TO_ORDER
+  COMPLETED
+}
+
+enum QuotationStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum DesignPlacement {
+  FRONT
+  BACK
+  LEFT_SLEEVE
+  RIGHT_SLEEVE
+  OTHER
+}
+
+enum UploadStatus {
+  PENDING
+  UPLOADED
+  REJECTED
+}
+
+// ─── Admin users & auth ─────────────────────────────────────────────────────
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  name             String
+  passwordHash     String
+  role             Role      @default(ADMIN)
+  isActive         Boolean   @default(true)
+  failedLoginCount Int       @default(0)
+  lockedUntil      DateTime?
+  lastLoginAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  sessions        AdminSession[]
+  activityLogs    AdminActivityLog[]
+  statusChanges   OrderStatusHistory[]
+  quotations      CustomizationQuotation[]
+}
+
+/// Server-side session. The cookie holds a random token; only its SHA-256 hash is stored.
+model AdminSession {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  userId     String
+  expiresAt  DateTime
+  lastUsedAt DateTime @default(now())
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+/// Login attempts, used for brute-force throttling without extra infrastructure.
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  ipAddress String?
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@index([ipAddress, createdAt])
+}
+
+// ─── Catalogue ──────────────────────────────────────────────────────────────
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  id             String        @id @default(cuid())
+  name           String
+  slug           String        @unique
+  description    String
+  categoryId     String
+  basePrice      Decimal       @db.Decimal(10, 2)
+  status         ProductStatus @default(DRAFT)
+  isFeatured     Boolean       @default(false)
+  isNewArrival   Boolean       @default(false)
+  isCustomizable Boolean       @default(false)
+  /// Placeholder artwork shown until real photos are uploaded: chest | back | graphic | sleeve | none
+  artPrint       String        @default("chest")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  category              Category               @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  variants              ProductVariant[]
+  images                ProductImage[]
+  orderItems            OrderItem[]
+  customizationRequests CustomizationRequest[]
+
+  @@index([categoryId, status])
+  @@index([status, isFeatured])
+  @@index([status, createdAt])
+}
+
+model ProductVariant {
+  id            String   @id @default(cuid())
+  productId     String
+  sku           String   @unique
+  size          String
+  colorName     String
+  colorHex      String
+  /// Overrides Product.basePrice when set.
+  price         Decimal? @db.Decimal(10, 2)
+  stockQuantity Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@unique([productId, size, colorName])
+  @@index([productId, isActive])
+}
+
+/// Public product images in the R2 public bucket.
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  objectKey String   @unique
+  url       String
+  altText   String
+  colorName String?
+  sortOrder Int      @default(0)
+  isPrimary Boolean  @default(false)
+  width     Int?
+  height    Int?
+  sizeBytes Int?
+  mimeType  String?
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, sortOrder])
+}
+
+// ─── Orders ─────────────────────────────────────────────────────────────────
+
+model Order {
+  id              String        @id @default(cuid())
+  reference       String        @unique
+  /// Sent by the client once per checkout so a double submit cannot create two orders.
+  idempotencyKey  String        @unique
+  customerName    String
+  customerPhone   String
+  deliveryAddress String
+  deliveryCity    String?
+  customerNote    String?
+  subtotal        Decimal       @db.Decimal(10, 2)
+  deliveryFee     Decimal       @default(0) @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(UNPAID)
+  adminNotes      String?
+  /// Set when the order was created from an accepted customization request.
+  sourceCustomizationRequestId String? @unique
+  confirmedAt     DateTime?
+  cancelledAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  items                     OrderItem[]
+  statusHistory             OrderStatusHistory[]
+  sourceCustomizationRequest CustomizationRequest? @relation(fields: [sourceCustomizationRequestId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([paymentStatus])
+  @@index([customerPhone])
+  @@index([createdAt])
+}
+
+/// Snapshot of what was bought. productId / variantId may become null if the product is deleted.
+model OrderItem {
+  id          String  @id @default(cuid())
+  orderId     String
+  productId   String?
+  variantId   String?
+  productName String
+  sku         String?
+  size        String
+  colorName   String
+  unitPrice   Decimal @db.Decimal(10, 2)
+  quantity    Int
+  lineTotal   Decimal @db.Decimal(10, 2)
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model OrderStatusHistory {
+  id                String         @id @default(cuid())
+  orderId           String
+  fromStatus        OrderStatus?
+  toStatus          OrderStatus?
+  fromPaymentStatus PaymentStatus?
+  toPaymentStatus   PaymentStatus?
+  note              String?
+  changedById       String?
+  createdAt         DateTime       @default(now())
+
+  order     Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  changedBy User? @relation(fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+}
+
+// ─── Customization ──────────────────────────────────────────────────────────
+
+/// A request for a quote. It is never an order by itself; see Order.sourceCustomizationRequestId.
+model CustomizationRequest {
+  id                     String              @id @default(cuid())
+  reference              String              @unique
+  idempotencyKey         String              @unique
+  customerName           String
+  customerPhone          String
+  productId              String?
+  productNameSnapshot    String
+  size                   String
+  colorName              String
+  quantity               Int
+  placements             DesignPlacement[]
+  designDescription      String
+  additionalInstructions String?
+  status                 CustomizationStatus @default(NEW_REQUEST)
+  adminNotes             String?
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+
+  product    Product?                 @relation(fields: [productId], references: [id], onDelete: SetNull)
+  images     CustomizationImage[]
+  quotations CustomizationQuotation[]
+  order      Order?
+
+  @@index([status, createdAt])
+  @@index([customerPhone])
+}
+
+/// Customer reference image in the PRIVATE R2 bucket. Served only through short-lived signed URLs.
+model CustomizationImage {
+  id               String       @id @default(cuid())
+  requestId        String
+  objectKey        String       @unique
+  originalFileName String
+  mimeType         String
+  sizeBytes        Int
+  status           UploadStatus @default(PENDING)
+  createdAt        DateTime     @default(now())
+
+  request CustomizationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+}
+
+model CustomizationQuotation {
+  id          String          @id @default(cuid())
+  requestId   String
+  version     Int
+  unitPrice   Decimal         @db.Decimal(10, 2)
+  quantity    Int
+  setupFee    Decimal         @default(0) @db.Decimal(10, 2)
+  deliveryFee Decimal         @default(0) @db.Decimal(10, 2)
+  total       Decimal         @db.Decimal(10, 2)
+  notes       String?
+  validUntil  DateTime?
+  status      QuotationStatus @default(DRAFT)
+  sentAt      DateTime?
+  createdById String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  request   CustomizationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdBy User?                @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@unique([requestId, version])
+}
+
+// ─── Settings & audit ───────────────────────────────────────────────────────
+
+/// Single-row table (id = 1) edited from the admin Business Settings page.
+model BusinessSetting {
+  id                  Int      @id @default(1)
+  businessName        String   @default("ORACK")
+  whatsappNumber      String
+  contactEmail        String?
+  contactPhone        String?
+  address             String?
+  instagramUrl        String?
+  facebookUrl         String?
+  tiktokUrl           String?
+  deliveryInfo        String?
+  announcementText    String?
+  announcementEnabled Boolean  @default(false)
+  updatedAt           DateTime @updatedAt
+}
+
+model AdminActivityLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+/// Fixed-window counters for rate limiting public actions (orders, custom requests).
+/// `key` is a hash of the action and client IP, so no raw IPs are stored.
+model RateLimit {
+  key         String
+  windowStart DateTime
+  count       Int      @default(0)
+
+  @@id([key, windowStart])
+  @@index([windowStart])
+}
