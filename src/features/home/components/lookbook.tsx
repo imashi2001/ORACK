@@ -26,15 +26,17 @@ export function Lookbook({ products }: { products: Product[] }) {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading id="lookbook-heading" index="[03]" eyebrow="Lookbook" title="On the streets" ghost="STREET" note="fresh off the rack ↓" />
           <p className="max-w-sm text-[15px] leading-relaxed text-graphite">Pieces from the current drop, styled the way they&apos;re meant to be worn. Tap any look to shop it.</p>
+          <p className="eyebrow -mt-2 text-smoke md:hidden">Swipe for more →</p>
         </div>
 
-        <div className="relative grid grid-cols-1 gap-5 md:auto-rows-[minmax(300px,auto)] md:grid-cols-12">
+        {/* Phones: a swipeable row of looks. Larger screens: the editorial grid. */}
+        <div className="relative -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:-mx-8 sm:px-8 md:mx-0 md:grid md:auto-rows-[minmax(300px,auto)] md:grid-cols-12 md:gap-5 md:overflow-visible md:px-0 md:pb-0">
           <SpinBadge id="lookbook" dark text="shop the look • shop the look • " className="-top-10 right-2 z-20 hidden md:block" />
           {picks.map((p, i) => {
             const slot = SLOTS[i];
             const colour = p.colours[Math.min(i % 2, p.colours.length - 1)];
             return (
-              <Reveal key={p.id} delay={i * 80} className={cn("relative", slot.cls)}>
+              <Reveal key={p.id} delay={i * 80} className={cn("relative aspect-[4/5] w-[78%] shrink-0 snap-start sm:w-[46%] md:aspect-auto md:w-auto", slot.cls)}>
                 <Link href={`/products/${p.slug}`} className="group/look relative flex size-full min-h-[inherit] flex-col justify-between overflow-hidden p-6">
                   <Tape onLight={!slot.dark} className={slot.tape} rotate={slot.rotate * 2} />
                   <span className={cn("eyebrow relative z-10 flex items-center justify-between", slot.dark ? "text-[#a3a3a3]" : "text-smoke")}>

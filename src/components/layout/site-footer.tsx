@@ -62,9 +62,11 @@ export function SiteFooter({ whatsappUrl, settings }: { whatsappUrl: string; set
           </nav>
           <nav aria-label="Help" className="flex flex-col gap-3 text-sm">
             <span className="eyebrow mb-1.5 text-[#8f8f8f]">Help</span>
+            <Link className={footerLink} href="/help">Help &amp; FAQ</Link>
             <Link className={footerLink} href="/#how-it-works">How ordering works</Link>
-            <a className={footerLink} href={whatsappUrl} target="_blank" rel="noopener noreferrer">Order status</a>
-            {settings.deliveryInfo && <span className="max-w-64 leading-relaxed text-[#a3a3a3]">{settings.deliveryInfo}</span>}
+            <Link className={footerLink} href="/size-guide">Size guide</Link>
+            <Link className={footerLink} href="/delivery-returns">Delivery &amp; returns</Link>
+            <Link className={footerLink} href="/contact">Contact us</Link>
           </nav>
           <div className="flex flex-col gap-3 text-sm text-[#a3a3a3]">
             <span className="eyebrow mb-1.5 text-[#8f8f8f]">Contact</span>
@@ -93,7 +95,12 @@ export function SiteFooter({ whatsappUrl, settings }: { whatsappUrl: string; set
 
         <div className="eyebrow flex flex-wrap justify-between gap-4 border-t border-[#1d1d1d] pt-6 text-[#8f8f8f]">
           <span>© 2026 {settings.businessName}. All rights reserved.</span>
-          <span>Prices in LKR · Pay on confirmation</span>
+          <span className="flex flex-wrap gap-x-5 gap-y-2">
+            <Link href="/privacy" className="hover:text-white">Privacy</Link>
+            <Link href="/terms" className="hover:text-white">Terms</Link>
+            <Link href="/about" className="hover:text-white">About</Link>
+            <span>Prices in LKR · Pay on confirmation</span>
+          </span>
         </div>
       </Container>
     </footer>

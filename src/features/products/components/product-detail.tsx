@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { ArrowRightIcon, CheckIcon, MinusIcon, PlusIcon } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowRightIcon, CheckIcon, ChevronLeftIcon, ChevronRightIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { useCart, MAX_QTY_PER_LINE } from "@/features/cart/cart-provider";
 import { useStoreSettings } from "@/features/settings/store-settings-provider";
+import { SizeChart } from "@/features/settings/size-chart";
+import { hasMeasurements } from "@/features/settings/size-guide";
 import { cta } from "@/components/shop/cta";
 import { WhatsAppIcon } from "@/components/shop/icons";
 import { Sticker, Tape } from "@/components/shop/street";
@@ -22,7 +24,7 @@ type View = { key: string; label: string } & ({ kind: "image"; url: string; alt:
 
 export function ProductDetail({ product }: { product: Product }) {
   const { addLine } = useCart();
-  const { whatsappNumber, deliveryInfo } = useStoreSettings();
+  const { whatsappNumber, deliveryInfo, sizeGuide } = useStoreSettings();
   const [colorName, setColorName] = useState(product.colours[0]?.name ?? "");
   const [size, setSize] = useState<string | null>(null);
   const [qty, setQty] = useState(1);
@@ -41,6 +43,8 @@ export function ProductDetail({ product }: { product: Product }) {
         { key: "detail", label: "Print detail", kind: "art", print: product.print, zoom: true },
       ];
   const current = views[Math.min(viewIndex, views.length - 1)];
+  const touchX = useRef<number | null>(null);
+  const step = (dir: 1 | -1) => setViewIndex((i) => (Math.min(i, views.length - 1) + dir + views.length) % views.length);
 
   const variantFor = (s: string) => product.variants.find((v) => v.colorName === colorName && v.size === s);
   const selected = size ? variantFor(size) : undefined;
@@ -87,9 +91,9 @@ export function ProductDetail({ product }: { product: Product }) {
 
   return (
     <div className="flex flex-wrap items-start gap-[clamp(32px,5vw,72px)]">
-      {/* Gallery */}
-      <div className="flex min-w-0 flex-[999_1_560px] flex-wrap-reverse gap-4">
-        <div role="group" aria-label="Product views" className="flex max-w-24 min-w-18 flex-[1_1_88px] flex-col gap-2.5">
+      {/* Gallery: thumbnails in a row under the photo on phones, a column beside it on larger screens. */}
+      <div className="flex min-w-0 flex-[999_1_560px] flex-col-reverse gap-3 sm:flex-row sm:gap-4">
+        <div role="group" aria-label="Product views" className="flex gap-2 overflow-x-auto sm:w-22 sm:shrink-0 sm:flex-col sm:gap-2.5 sm:overflow-visible">
           {views.map((v, i) => (
             <button
               key={v.key}
@@ -98,8 +102,9 @@ export function ProductDetail({ product }: { product: Product }) {
               aria-pressed={current.key === v.key}
               onClick={() => setViewIndex(i)}
               className={cn(
-                "relative flex aspect-[4/5] items-center justify-center overflow-hidden border-[1.5px] bg-mist",
-                v.kind === "art" && "p-[10%]",
+                "relative flex aspect-[4/5] w-16 shrink-0 items-center justify-center overflow-hidden border-[1.5px] bg-mist sm:w-full",
+                // Fixed padding: a % would be measured against the whole thumbnail row, not the button.
+                v.kind === "art" && "p-2",
                 current.key === v.key ? "border-ink" : "border-transparent hover:border-[#9a9a97]",
               )}
             >
@@ -107,19 +112,56 @@ export function ProductDetail({ product }: { product: Product }) {
             </button>
           ))}
         </div>
-        <div className="relative flex aspect-[4/5] min-w-0 flex-[999_1_420px] items-center justify-center overflow-hidden bg-mist">
+        <div
+          className="group/gallery relative flex aspect-[4/5] min-w-0 flex-1 touch-pan-y items-center justify-center overflow-hidden bg-mist"
+          onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
+          onTouchEnd={(e) => {
+            if (touchX.current === null) return;
+            const dx = e.changedTouches[0].clientX - touchX.current;
+            touchX.current = null;
+            if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
+          }}
+        >
           {current.kind === "art" && <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,#f7f7f5_0%,rgba(233,233,230,0)_62%)]" />}
           <Tape onLight className="-top-2.5 left-[30%]" rotate={-6} />
-          {renderView(current, true)}
-          <span className="eyebrow absolute top-6 left-5 text-smoke">{current.label}</span>
+          <div key={current.key} className="animate-in fade-in absolute inset-0 flex items-center justify-center duration-300">
+            {renderView(current, true)}
+          </div>
+          <span className="eyebrow absolute top-5 left-4 text-smoke sm:top-6 sm:left-5">{current.label}</span>
           {product.isCustomizable && (
-            <span className="absolute top-6 right-5">
+            <span className="absolute top-5 right-4 sm:top-6 sm:right-5">
               <Sticker tone="dark" rotate={4}>
                 Customizable
               </Sticker>
             </span>
           )}
-          <span className="eyebrow absolute bottom-5 left-5 text-smoke">
+          {views.length > 1 && (
+            <>
+              <button
+                type="button"
+                aria-label="Previous view"
+                onClick={() => step(-1)}
+                className="absolute top-1/2 left-3 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-ink opacity-0 shadow-sm transition-opacity group-hover/gallery:opacity-100 focus-visible:opacity-100 sm:flex"
+              >
+                <ChevronLeftIcon className="size-5" />
+              </button>
+              <button
+                type="button"
+                aria-label="Next view"
+                onClick={() => step(1)}
+                className="absolute top-1/2 right-3 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-ink opacity-0 shadow-sm transition-opacity group-hover/gallery:opacity-100 focus-visible:opacity-100 sm:flex"
+              >
+                <ChevronRightIcon className="size-5" />
+              </button>
+              {/* Dots on phones, counter on larger screens */}
+              <div aria-hidden="true" className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5 sm:hidden">
+                {views.map((v) => (
+                  <span key={v.key} className={cn("h-1.5 rounded-full transition-all", v.key === current.key ? "w-5 bg-ink" : "w-1.5 bg-ink/25")} />
+                ))}
+              </div>
+            </>
+          )}
+          <span className="eyebrow absolute bottom-5 left-5 hidden text-smoke sm:block">
             {views.indexOf(current) + 1} / {views.length}
           </span>
         </div>
@@ -198,29 +240,22 @@ export function ProductDetail({ product }: { product: Product }) {
             <span aria-live="polite">{stock.text}</span>
           </div>
           {guideOpen && (
-            <div className="border border-[#e3e3e0] bg-white p-4.5">
-              <table className="w-full border-collapse text-left text-sm">
-                <caption className="eyebrow pb-2 text-left text-smoke">Garment measurements (cm)</caption>
-                <thead>
-                  <tr className="border-b border-[#e3e3e0]">
-                    {["Size", "Chest", "Length", "Sleeve"].map((h) => (
-                      <th key={h} scope="col" className="px-2 py-2.5 font-semibold">
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {product.sizes.map((s) => (
-                    <tr key={s} className="border-b border-[#e3e3e0]">
-                      <td className="px-2 py-2.5">{s}</td>
-                      <td className="px-2 py-2.5">[XX]</td>
-                      <td className="px-2 py-2.5">[XX]</td>
-                      <td className="px-2 py-2.5">[XX]</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex flex-col gap-3 border border-[#e3e3e0] bg-white p-4.5">
+              {hasMeasurements(sizeGuide[product.kind]) ? (
+                <SizeChart rows={sizeGuide[product.kind]} highlight={size} />
+              ) : (
+                <p className="text-sm leading-relaxed text-graphite">
+                  Our fits are oversized and relaxed. If you&apos;re between sizes, go with your usual size for the boxy look, or one down for a closer fit.
+                </p>
+              )}
+              <div className="flex flex-wrap gap-x-5 gap-y-2 text-[13px]">
+                <Link href="/size-guide" className="font-semibold underline underline-offset-3">
+                  How to measure
+                </Link>
+                <a href={buildWhatsAppUrl(`Hi ORACK! Can you help me pick a size for the ${product.name}?`, whatsappNumber)} target="_blank" rel="noopener noreferrer" className="font-semibold underline underline-offset-3">
+                  Ask us about fit
+                </a>
+              </div>
             </div>
           )}
         </div>

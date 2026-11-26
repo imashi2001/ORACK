@@ -38,7 +38,7 @@ export function ProductCard({ product, surface = "paper", priority }: { product:
   const lowStock = !soldOut && stockForColour <= LOW_STOCK;
 
   return (
-    <article className="group/card flex flex-col gap-3.5">
+    <article className="group/card @container flex flex-col gap-2.5 @[220px]:gap-3.5">
       <div className={cn("relative aspect-[4/5] overflow-hidden transition-colors group-hover/card:bg-[#e2e2df]", surface === "paper" ? "bg-mist" : "bg-[#eeeeeb]")}>
         <Link href={href} aria-label={product.name} className="absolute inset-0 block">
           {front ? (
@@ -75,24 +75,32 @@ export function ProductCard({ product, surface = "paper", priority }: { product:
         </div>
 
         {!soldOut && (
-          <div className="absolute inset-x-3 bottom-3 translate-y-2 opacity-0 transition-all group-focus-within/card:translate-y-0 group-focus-within/card:opacity-100 group-hover/card:translate-y-0 group-hover/card:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100">
+          <div
+            className={cn(
+              // Narrow cards (two per row on phones) get a round "+" button; wider cards get the full-width bar.
+              "absolute bottom-2 translate-y-2 opacity-0 transition-all @[220px]:inset-x-3 @[220px]:bottom-3",
+              quickOpen ? "inset-x-2" : "right-2",
+              " group-focus-within/card:translate-y-0 group-focus-within/card:opacity-100 group-hover/card:translate-y-0 group-hover/card:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100",
+            )}
+          >
             {!quickOpen ? (
               <button
                 type="button"
                 onClick={() => setQuickOpen(true)}
-                className="flex min-h-11.5 w-full items-center justify-center gap-2.5 bg-ink text-[13px] font-semibold tracking-[0.14em] text-white uppercase hover:bg-[#2c2c2c]"
+                aria-label={`Quick add ${product.name}`}
+                className="flex size-10 items-center justify-center gap-2.5 rounded-full bg-ink text-[13px] font-semibold tracking-[0.14em] text-white uppercase shadow-[0_6px_16px_rgba(0,0,0,0.25)] hover:bg-[#2c2c2c] @[220px]:h-auto @[220px]:min-h-11.5 @[220px]:w-full @[220px]:rounded-none @[220px]:shadow-none"
               >
-                Quick add <PlusIcon className="size-3.5" />
+                <span className="hidden @[220px]:inline">Quick add</span> <PlusIcon className="size-4 @[220px]:size-3.5" />
               </button>
             ) : (
-              <div className="flex flex-col gap-2.5 bg-white p-3 shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
+              <div className="flex flex-col gap-2 bg-white p-2.5 shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
                 <div className="flex items-center justify-between">
-                  <span className="eyebrow text-[10px] text-smoke">Select size · {colorName}</span>
+                  <span className="eyebrow truncate text-[10px] text-smoke">Size · {colorName}</span>
                   <button type="button" onClick={() => setQuickOpen(false)} aria-label="Close sizes" className="p-1">
                     <XIcon className="size-3.5" />
                   </button>
                 </div>
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(40px,1fr))] gap-1.5">
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(36px,1fr))] gap-1.5">
                   {product.sizes.map((size) => {
                     const variant = product.variants.find((v) => v.colorName === colorName && v.size === size);
                     const out = !variant || variant.stock === 0;
@@ -121,18 +129,18 @@ export function ProductCard({ product, surface = "paper", priority }: { product:
       </div>
 
       <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-col gap-1.5">
-          <Link href={href} className="text-base font-semibold underline-offset-4 hover:underline">
+        <div className="flex min-w-0 flex-col gap-1 @[220px]:gap-1.5">
+          <Link href={href} className="text-sm leading-snug font-semibold underline-offset-4 hover:underline @[220px]:text-base">
             {product.name}
           </Link>
-          <span className="text-[15px] text-graphite">{priceLabel}</span>
+          <span className="text-sm text-graphite @[220px]:text-[15px]">{priceLabel}</span>
         </div>
-        <span className="eyebrow pt-1 text-[10px] text-smoke">
+        <span className="eyebrow hidden shrink-0 pt-1 text-[10px] text-smoke @[220px]:inline">
           {product.colours.length} {product.colours.length === 1 ? "colour" : "colours"}
         </span>
       </div>
 
-      <div className="flex items-center gap-2.5" role="group" aria-label={`${product.name} colours`}>
+      <div className="flex items-center gap-2 @[220px]:gap-2.5" role="group" aria-label={`${product.name} colours`}>
         {product.colours.map((c) => (
           <button
             key={c.name}
@@ -142,7 +150,8 @@ export function ProductCard({ product, surface = "paper", priority }: { product:
             onClick={() => setColorName(c.name)}
             style={{ backgroundColor: c.hex }}
             className={cn(
-              "size-5.5 rounded-full border border-black/25 transition-transform hover:scale-110",
+              // 20px dot inside a 32px tap target keeps swatches easy to hit on phones.
+              "relative size-5 rounded-full border border-black/25 transition-transform before:absolute before:-inset-1.5 hover:scale-110 @[220px]:size-5.5",
               c.name === colorName && (surface === "paper" ? "shadow-[0_0_0_2px_#f3f3f1,0_0_0_3.5px_#0a0a0a]" : "shadow-[0_0_0_2px_#fff,0_0_0_3.5px_#0a0a0a]"),
             )}
           />

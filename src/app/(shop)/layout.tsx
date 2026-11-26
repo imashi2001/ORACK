@@ -12,7 +12,7 @@ export default async function ShopLayout({ children }: LayoutProps<"/">) {
   const settings = await getPublicSettings();
   const whatsappUrl = buildWhatsAppUrl(generalEnquiryMessage, settings.whatsappNumber);
   return (
-    <StoreSettingsProvider value={{ whatsappNumber: settings.whatsappNumber, deliveryInfo: settings.deliveryInfo }}>
+    <StoreSettingsProvider value={{ whatsappNumber: settings.whatsappNumber, deliveryInfo: settings.deliveryInfo, sizeGuide: settings.sizeGuide }}>
       <CartProvider>
         <AnnouncementBar items={settings.announcement} />
         <SiteHeader

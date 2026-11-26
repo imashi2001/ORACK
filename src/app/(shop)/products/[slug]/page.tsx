@@ -56,7 +56,7 @@ async function ProductContent({ params }: Pick<PageProps<"/products/[slug]">, "p
         <h2 id="related-heading" className="display text-[clamp(40px,5vw,64px)]">
           Complete the look
         </h2>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,240px),1fr))] gap-6">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] sm:gap-6">
           {related.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

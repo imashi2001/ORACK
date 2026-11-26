@@ -26,7 +26,7 @@ function ProductsSkeleton() {
     <div className="flex flex-col gap-10" aria-hidden="true">
       <div className="h-28 w-2/3 bg-mist" />
       <div className="h-18 border-y border-line" />
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-x-3 gap-y-8 sm:gap-6">
         {Array.from({ length: 4 }, (_, i) => (
           <div key={i} className="aspect-[4/5] bg-mist" />
         ))}

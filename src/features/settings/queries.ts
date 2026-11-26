@@ -2,6 +2,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { siteConfig } from "@/config/site";
 import { getPrisma } from "@/lib/prisma";
+import { parseSizeGuide, type SizeGuide } from "./size-guide";
 
 export const SETTINGS_TAG = "settings";
 
@@ -16,6 +17,7 @@ export interface PublicSettings {
   tiktokUrl: string | null;
   deliveryInfo: string | null;
   announcement: string[];
+  sizeGuide: SizeGuide;
 }
 
 /** Business settings for the storefront. Falls back to config defaults until an admin saves them. */
@@ -41,5 +43,6 @@ export async function getPublicSettings(): Promise<PublicSettings> {
     tiktokUrl: row?.tiktokUrl || siteConfig.social.tiktok,
     deliveryInfo: row?.deliveryInfo ?? null,
     announcement,
+    sizeGuide: parseSizeGuide(row?.sizeGuide),
   };
 }

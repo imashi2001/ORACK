@@ -370,6 +370,8 @@ model BusinessSetting {
   deliveryInfo        String?
   announcementText    String?
   announcementEnabled Boolean  @default(false)
+  /// Garment measurements per size, edited in Admin → Settings: { tee: Row[], hoodie: Row[] }.
+  sizeGuide           Json?
   updatedAt           DateTime @updatedAt
 }
 

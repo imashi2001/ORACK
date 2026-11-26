@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { ArrowRightIcon, MenuIcon, SearchIcon, ShoppingBagIcon, XIcon } from "lucide-react";
 import { mainNav } from "@/config/site";
 import { useCart } from "@/features/cart/cart-provider";
@@ -54,28 +54,19 @@ function ActivePrimaryLinks() {
  * Site header.
  * - On the homepage it starts transparent over the hero photo (CSS `over-hero` variant, so there is no flash before JS),
  *   and turns into a solid, blurred bar once you scroll. Other pages always get the solid bar.
- * - It slides away while scrolling down a long page and comes back as soon as you scroll up.
  */
 export function SiteHeader({ whatsappUrl, socials }: { whatsappUrl: string; socials: HeaderSocials }) {
   const { count, setOpen } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
 
   useEffect(() => {
     let frame = 0;
     const onScroll = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const y = window.scrollY;
-        const delta = y - lastY.current;
-        setScrolled(y > 12);
-        if (y < 320) setHidden(false);
-        else if (delta > 8) setHidden(true);
-        else if (delta < -8) setHidden(false);
-        lastY.current = y;
+        setScrolled(window.scrollY > 12);
       });
     };
     onScroll();
@@ -119,10 +110,9 @@ export function SiteHeader({ whatsappUrl, socials }: { whatsappUrl: string; soci
       data-solid={scrolled || panelOpen ? "" : undefined}
       className={cn(
         // The divider is an inset shadow rather than a border so the bar is exactly h-18 tall (the hero tucks under it by that much).
-        "sticky top-0 z-40 bg-ink/95 text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition-[background-color,transform,box-shadow] duration-300 ease-out",
+        "sticky top-0 z-40 bg-ink/95 text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition-[background-color,box-shadow] duration-300 ease-out",
         scrolled && "shadow-[inset_0_-1px_0_rgba(255,255,255,0.08),0_10px_30px_rgba(0,0,0,0.3)]",
         "over-hero:bg-transparent over-hero:shadow-none over-hero:backdrop-blur-none",
-        hidden && !panelOpen && "-translate-y-full",
       )}
     >
       <Container className="relative grid h-18 grid-cols-[1fr_auto_1fr] items-center gap-6">

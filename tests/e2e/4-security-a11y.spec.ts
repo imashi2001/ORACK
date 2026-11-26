@@ -28,7 +28,7 @@ test.describe("security", () => {
 });
 
 test.describe("accessibility (axe, WCAG 2.1 A/AA)", () => {
-  for (const path of ["/", "/products", "/products/classic-oversized-tee", "/customize", "/admin/login"]) {
+  for (const path of ["/", "/products", "/products/classic-oversized-tee", "/customize", "/about", "/help", "/size-guide", "/delivery-returns", "/contact", "/privacy", "/terms", "/admin/login"]) {
     test(`no serious violations on ${path}`, async ({ page }) => {
       await page.goto(path);
       await page.waitForLoadState("networkidle");

@@ -102,7 +102,7 @@ export function ProductBrowser({ products, categories }: { products: Product[]; 
       </p>
 
       {list.length > 0 ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-x-6 gap-y-8">
+        <div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-x-3 gap-y-8 sm:gap-x-6">
           {list.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

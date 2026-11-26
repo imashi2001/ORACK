@@ -25,5 +25,5 @@ export const mainNav = [
   { label: "Hoodies", href: "/products?category=hoodies" },
   { label: "New In", href: "/products?sort=newest" },
   { label: "Customize", href: "/customize" },
-  { label: "About", href: "/#story" },
+  { label: "About", href: "/about" },
 ] as const;
