@@ -1,3 +1,4 @@
+import { BrandGlyph } from "@/components/shop/icons";
 import { cn } from "@/lib/utils";
 
 /** Rotated label sticker, e.g. "NEW", "DROP 01". */
@@ -44,9 +45,7 @@ export function SpinBadge({ text, className, dark, id = "a" }: { text: string; c
           <textPath href={`#spin-badge-${id}`} textLength="234" lengthAdjust="spacing">{text}</textPath>
         </text>
       </svg>
-      <svg viewBox="-14 -14 28 28" className={cn("absolute top-1/2 left-1/2 size-7 -translate-x-1/2 -translate-y-1/2", dark ? "fill-white" : "fill-ink")}>
-        <path d="M0 -14 L4 -4 L14 -4 L6 2 L9 12 L0 6 L-9 12 L-6 2 L-14 -4 L-4 -4 Z" />
-      </svg>
+      <BrandGlyph className={cn("absolute top-1/2 left-1/2 h-auto w-9 -translate-x-1/2 -translate-y-1/2", dark ? "text-white" : "text-ink")} />
     </span>
   );
 }

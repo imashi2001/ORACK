@@ -6,6 +6,7 @@ import { ArrowRightIcon, PauseIcon, PlayIcon } from "lucide-react";
 import { cta } from "@/components/shop/cta";
 import { Container } from "@/components/shop/container";
 import { SpinBadge, Sticker, Tape } from "@/components/shop/street";
+import { LogoMark } from "@/components/brand/logo";
 import { GarmentArt } from "@/features/products/components/garment-art";
 import { cn } from "@/lib/utils";
 
@@ -94,8 +95,8 @@ export function Hero() {
       </svg>
       {/* Faint grid, like a cutting mat */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:64px_64px]" />
-      <div aria-hidden="true" className="display text-outline pointer-events-none absolute -right-[2vw] -bottom-[4vw] text-[clamp(180px,30vw,460px)] whitespace-nowrap">
-        ORACK.
+      <div aria-hidden="true" className="pointer-events-none absolute -right-[6vw] -bottom-[10vw] w-[min(72vw,920px)] text-white/[0.07]">
+        <LogoMark outline />
       </div>
 
       <Container className="relative grid min-h-[clamp(620px,86vh,800px)] grid-cols-[repeat(auto-fit,minmax(min(100%,480px),1fr))] items-center gap-10 pt-[clamp(48px,6vw,80px)] pb-12">

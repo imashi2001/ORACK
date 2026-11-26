@@ -159,7 +159,8 @@
   .eyebrow {
     font-family: var(--font-mono);
     font-size: 11px;
-    letter-spacing: 0.1em;
+    /* Wide, airy spacing echoes the ORACK wordmark. */
+    letter-spacing: 0.16em;
     text-transform: uppercase;
   }
   .text-outline {

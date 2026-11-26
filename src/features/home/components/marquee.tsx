@@ -1,8 +1,9 @@
-import { StarMark } from "@/components/shop/icons";
+import { LogoWordmark } from "@/components/brand/logo";
+import { BrandGlyph } from "@/components/shop/icons";
 import { cn } from "@/lib/utils";
 
-const TOP = ["Wear your identity", "T-Shirts", "Hoodies", "Custom designs", "ORACK.", "Islandwide delivery"];
-const BOTTOM = ["New drop", "Order on WhatsApp", "Made in Sri Lanka", "Oversized fits", "Print your idea", "ORACK."];
+const TOP = ["Wear your identity", "T-Shirts", "Hoodies", "Custom designs", "ORACK", "Islandwide delivery"];
+const BOTTOM = ["New drop", "Order on WhatsApp", "Made in Sri Lanka", "Oversized fits", "Print your idea", "ORACK"];
 
 function Band({ words, dark, reverse, rotate }: { words: string[]; dark?: boolean; reverse?: boolean; rotate: string }) {
   const items = [...words, ...words];
@@ -11,8 +12,12 @@ function Band({ words, dark, reverse, rotate }: { words: string[]; dark?: boolea
       <div className={cn("flex w-max items-center gap-9", reverse ? "animate-marquee-reverse" : "animate-marquee")}>
         {items.map((w, i) => (
           <span key={i} className="flex items-center gap-9">
-            <span className="display text-[clamp(22px,2.6vw,30px)] whitespace-nowrap">{w}</span>
-            <StarMark className="size-4" />
+            {w === "ORACK" ? (
+              <LogoWordmark className="h-[clamp(14px,1.6vw,19px)] w-auto" />
+            ) : (
+              <span className="display text-[clamp(22px,2.6vw,30px)] whitespace-nowrap">{w}</span>
+            )}
+            <BrandGlyph className="h-5 w-auto" />
           </span>
         ))}
       </div>

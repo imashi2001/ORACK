@@ -5,6 +5,7 @@ import { Container } from "@/components/shop/container";
 import { WhatsAppIcon } from "@/components/shop/icons";
 import { Reveal } from "@/components/shop/reveal";
 import { SectionHeading } from "@/components/shop/street";
+import { LogoMark, LogoStacked } from "@/components/brand/logo";
 
 const ORDER_STEPS = [
   { title: "Add to bag", body: "Pick your size and colour. Stock is checked live." },
@@ -67,10 +68,14 @@ export function Story() {
     <section id="story" aria-labelledby="story-heading" className="scroll-mt-24 overflow-hidden bg-ink text-white">
       <Container className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,460px),1fr))] items-center gap-[clamp(40px,6vw,88px)] py-[clamp(64px,8vw,112px)]">
         <div aria-hidden="true" className="relative aspect-[5/4] overflow-hidden bg-[linear-gradient(160deg,#2b2b2a_0%,#121212_70%)]">
-          <div className="absolute top-1/2 -right-[6%] -left-[6%] flex -translate-y-1/2 -rotate-12 flex-col gap-1">
-            <span className="display text-[clamp(80px,11vw,160px)] whitespace-nowrap text-transparent [-webkit-text-stroke:1.5px_#4a4a4a]">ORACK. ORACK.</span>
-            <span className="display pl-[12%] text-[clamp(80px,11vw,160px)] whitespace-nowrap">ORACK. ORACK.</span>
-            <span className="display pl-[4%] text-[clamp(80px,11vw,160px)] whitespace-nowrap text-transparent [-webkit-text-stroke:1.5px_#4a4a4a]">ORACK. ORACK.</span>
+          {/* Faint pattern of outlined marks, with the stacked logo on top. */}
+          <div className="absolute inset-0 grid grid-cols-4 place-items-center gap-6 p-6 text-white/[0.07]">
+            {Array.from({ length: 12 }, (_, k) => (
+              <LogoMark key={k} outline className={k % 2 ? "w-3/5" : "w-4/5"} />
+            ))}
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <LogoStacked className="text-[clamp(56px,7vw,96px)] text-white" />
           </div>
           <span className="eyebrow absolute bottom-4.5 left-5 text-[#8f8f8f]">Est. Sri Lanka</span>
         </div>

@@ -1,4 +1,5 @@
 import type { SVGProps } from "react";
+import { MARK } from "@/components/brand/logo-paths";
 
 /** WhatsApp-style chat bubble (line icon, matches lucide stroke weight). */
 export function WhatsAppIcon(props: SVGProps<SVGSVGElement>) {
@@ -10,10 +11,11 @@ export function WhatsAppIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export function StarMark(props: SVGProps<SVGSVGElement>) {
+/** Small ORACK monogram used as a separator glyph (tickers, badges). */
+export function BrandGlyph(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="-14 -14 28 28" fill="currentColor" aria-hidden="true" {...props}>
-      <path d="M0 -14 L4 -4 L14 -4 L6 2 L9 12 L0 6 L-9 12 L-6 2 L-14 -4 L-4 -4 Z" />
+    <svg viewBox={MARK.viewBox} fill="currentColor" aria-hidden="true" {...props}>
+      <path d={MARK.d} fillRule="evenodd" />
     </svg>
   );
 }

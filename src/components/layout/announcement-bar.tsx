@@ -1,4 +1,4 @@
-import { StarMark } from "@/components/shop/icons";
+import { BrandGlyph } from "@/components/shop/icons";
 
 /** Scrolling ticker of store announcements (from Admin → Settings). */
 export function AnnouncementBar({ items }: { items: string[] }) {
@@ -12,7 +12,7 @@ export function AnnouncementBar({ items }: { items: string[] }) {
         {[...loop, ...loop].map((text, i) => (
           <span key={i} className="eyebrow flex items-center gap-8 whitespace-nowrap">
             {text}
-            <StarMark className="size-2.5 fill-[#6b6b6b]" />
+            <BrandGlyph className="h-2.5 w-auto text-[#6b6b6b]" />
           </span>
         ))}
       </div>

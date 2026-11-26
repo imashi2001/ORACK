@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Suspense, useState } from "react";
 import { FolderTreeIcon, LayoutDashboardIcon, MenuIcon, PaletteIcon, PackageIcon, SettingsIcon, ShoppingCartIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LogoHorizontal } from "@/components/brand/logo";
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboardIcon, exact: true },
@@ -55,8 +56,8 @@ export function AdminNav({ children }: { children?: React.ReactNode }) {
     <>
       {/* Mobile top bar */}
       <div className="flex h-14 items-center justify-between bg-ink px-4 text-white lg:hidden">
-        <Link href="/admin" className="display text-2xl">
-          ORACK.
+        <Link href="/admin" aria-label="ORACK admin home" className="text-[22px]">
+          <LogoHorizontal />
         </Link>
         <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"} className="flex size-10 items-center justify-center">
           {open ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
@@ -67,7 +68,7 @@ export function AdminNav({ children }: { children?: React.ReactNode }) {
       {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-8 bg-ink px-3 py-6 text-white lg:flex">
         <Link href="/admin" className="flex items-baseline gap-2 px-3">
-          <span className="display text-3xl">ORACK.</span>
+          <LogoHorizontal className="text-[24px]" />
           <span className="eyebrow text-[10px] text-[#8f8f8f]">Admin</span>
         </Link>
         {links}

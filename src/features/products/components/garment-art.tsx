@@ -1,3 +1,4 @@
+import { MARK, WORDMARK } from "@/components/brand/logo-paths";
 import type { GarmentKind, PrintStyle, Tone } from "../types";
 
 /**
@@ -14,9 +15,32 @@ const PALETTE: Record<Tone, { base: string; light: string; dark: string; rib: st
 
 const TEE = "M150 46 Q200 80 250 46 L304 62 L368 150 L326 192 L292 168 L296 418 Q200 426 104 418 L108 168 L74 192 L32 150 L96 62 Z";
 const HOODIE = "M128 80 Q132 24 200 20 Q268 24 272 80 L314 94 L362 200 L372 384 L330 390 L320 236 L302 206 L304 412 Q200 420 96 412 L98 206 L80 236 L70 390 L28 384 L38 200 L86 94 Z";
-const STAR = "M0 -14 L4 -4 L14 -4 L6 2 L9 12 L0 6 L-9 12 L-6 2 L-14 -4 L-4 -4 Z";
 
-const wordmark = { fontFamily: "var(--font-archivo), sans-serif", fontWeight: 900, fontStyle: "italic", fontStretch: "70%" } as const;
+// Logo artwork sizes (from the traced official logo): mark 1122×971, wordmark 2156×365.
+const MARK_W = 1122;
+const MARK_H = 971;
+const WORD_W = 2156;
+const WORD_H = 365;
+
+/** The ORACK mark, centred on (cx, cy) at the given width. */
+function Mark({ cx, cy, width, fill, opacity, rotate = 0 }: { cx: number; cy: number; width: number; fill: string; opacity?: number; rotate?: number }) {
+  const s = width / MARK_W;
+  return (
+    <g transform={`translate(${cx} ${cy}) rotate(${rotate}) scale(${s}) translate(${-MARK_W / 2} ${-MARK_H / 2})`} opacity={opacity}>
+      <path d={MARK.d} fill={fill} fillRule="evenodd" />
+    </g>
+  );
+}
+
+/** The ORACK wordmark, centred on (cx, cy) at the given width. */
+function Wordmark({ cx, cy, width, fill }: { cx: number; cy: number; width: number; fill: string }) {
+  const s = width / WORD_W;
+  return (
+    <g transform={`translate(${cx} ${cy}) scale(${s}) translate(${-WORD_W / 2} ${-WORD_H / 2})`}>
+      <path d={WORDMARK.d} fill={fill} fillRule="evenodd" />
+    </g>
+  );
+}
 
 interface GarmentArtProps {
   kind: GarmentKind;
@@ -33,8 +57,8 @@ export function GarmentArt({ kind, tone, print = "chest", shadow = true, classNa
   // Deterministic ids: identical props produce identical gradients, so duplicates are harmless.
   const id = `orack-${kind}-${tone}`;
   const pos = isTee
-    ? { chestX: 246, chestY: 128, chestSize: 22, backY: 196, starY: 246, globeY: 178, globeTextY: 262, sleeveX: 66, sleeveY: 150, sleeveR: 45 }
-    : { chestX: 200, chestY: 250, chestSize: 30, backY: 238, starY: 288, globeY: 222, globeTextY: 290, sleeveX: 52, sleeveY: 300, sleeveR: -84 };
+    ? { chestX: 246, chestY: 124, chestW: 34, backY: 186, wordY: 262, globeY: 172, globeTextY: 252, sleeveX: 64, sleeveY: 150, sleeveR: 45 }
+    : { chestX: 200, chestY: 246, chestW: 46, backY: 222, wordY: 296, globeY: 220, globeTextY: 286, sleeveX: 52, sleeveY: 300, sleeveR: -84 };
 
   return (
     <svg viewBox="0 0 400 440" className={className} role={title ? "img" : undefined} aria-label={title} aria-hidden={title ? undefined : true}>
@@ -89,20 +113,13 @@ export function GarmentArt({ kind, tone, print = "chest", shadow = true, classNa
         </g>
       )}
 
-      {(print === "chest" || print === "sleeve") && (
-        <text x={pos.chestX} y={pos.chestY} fontSize={pos.chestSize} fill={c.ink} textAnchor="middle" opacity={print === "sleeve" ? 0.18 : 1} style={wordmark}>
-          ORACK.
-        </text>
-      )}
+      {(print === "chest" || print === "sleeve") && <Mark cx={pos.chestX} cy={pos.chestY} width={pos.chestW} fill={c.ink} opacity={print === "sleeve" ? 0.18 : 1} />}
 
+      {/* Back print: the full stacked logo, as on the official artwork. */}
       {print === "back" && (
-        <g fill={c.ink}>
-          <g transform={`translate(200 ${pos.backY}) rotate(-9)`}>
-            <text x="0" y="0" fontSize="74" textAnchor="middle" style={{ ...wordmark, fontStretch: "68%", letterSpacing: "-1px" }}>
-              ORACK.
-            </text>
-          </g>
-          <path transform={`translate(200 ${pos.starY})`} d={STAR} />
+        <g>
+          <Mark cx={200} cy={pos.backY} width={130} fill={c.ink} />
+          <Wordmark cx={200} cy={pos.wordY} width={150} fill={c.ink} />
         </g>
       )}
 
@@ -117,19 +134,11 @@ export function GarmentArt({ kind, tone, print = "chest", shadow = true, classNa
             <path d="M-66 -18 Q0 -26 66 -18" />
             <path d="M-66 18 Q0 26 66 18" />
           </g>
-          <text x="214" y={pos.globeTextY} fontSize="40" fill={c.ink} textAnchor="middle" style={{ ...wordmark, fontStretch: "68%" }}>
-            ORACK.
-          </text>
+          <Wordmark cx={200} cy={pos.globeTextY} width={118} fill={c.ink} />
         </g>
       )}
 
-      {print === "sleeve" && (
-        <g transform={`translate(${pos.sleeveX} ${pos.sleeveY}) rotate(${pos.sleeveR})`}>
-          <text x="0" y="0" fontSize="17" fill={c.ink} textAnchor="middle" style={wordmark}>
-            ORACK.
-          </text>
-        </g>
-      )}
+      {print === "sleeve" && <Mark cx={pos.sleeveX} cy={pos.sleeveY} width={24} fill={c.ink} rotate={pos.sleeveR} />}
     </svg>
   );
 }

@@ -3,6 +3,7 @@ import { ArrowRightIcon } from "lucide-react";
 import { Container } from "@/components/shop/container";
 import { cta } from "@/components/shop/cta";
 import type { PublicSettings } from "@/features/settings/queries";
+import { LogoHorizontal, LogoMark, LogoWordmark } from "@/components/brand/logo";
 
 const footerLink = "text-[#a3a3a3] transition-colors hover:text-white";
 
@@ -29,7 +30,7 @@ export function SiteFooter({ whatsappUrl, settings }: { whatsappUrl: string; set
 
         <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-10">
           <div className="flex flex-col gap-4">
-            <span className="display text-4xl">{settings.businessName}.</span>
+            <LogoHorizontal className="text-[30px]" title={settings.businessName} />
             <p className="max-w-64 text-sm leading-relaxed text-[#a3a3a3]">Minimal streetwear and custom prints, made in Sri Lanka.</p>
             {socials.length > 0 && (
               <div className="-ml-2.5 flex gap-1 text-sm">
@@ -67,9 +68,12 @@ export function SiteFooter({ whatsappUrl, settings }: { whatsappUrl: string; set
           </div>
         </div>
 
-        <div aria-hidden="true" className="relative -mx-2 overflow-hidden select-none">
-          <span className="display block text-center text-[clamp(96px,24vw,360px)] leading-[0.8] text-white">{settings.businessName}.</span>
-          <span className="marker absolute right-[6%] bottom-[18%] rotate-[-8deg] text-[clamp(16px,2vw,26px)] text-[#a3a3a3]">wear your identity</span>
+        <div aria-hidden="true" className="relative -mx-2 overflow-hidden pt-[clamp(28px,4vw,56px)] select-none">
+          <div className="flex items-end gap-[3vw] px-2">
+            <LogoMark className="w-[18%] shrink-0 text-white" />
+            <LogoWordmark className="w-full text-white" />
+          </div>
+          <span className="marker absolute top-0 right-[2%] rotate-[-6deg] text-[clamp(16px,2vw,26px)] text-[#a3a3a3]">wear your identity</span>
         </div>
 
         <div className="eyebrow flex flex-wrap justify-between gap-4 border-t border-[#1d1d1d] pt-6 text-[#8f8f8f]">

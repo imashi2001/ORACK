@@ -9,6 +9,7 @@ import { useCart } from "@/features/cart/cart-provider";
 import { WhatsAppIcon } from "@/components/shop/icons";
 import { Container } from "@/components/shop/container";
 import { cn } from "@/lib/utils";
+import { LogoHorizontal } from "@/components/brand/logo";
 
 const iconBtn = "relative inline-flex size-11 items-center justify-center rounded-full transition-colors hover:bg-white/10";
 
@@ -60,12 +61,12 @@ export function SiteHeader({ whatsappUrl }: { whatsappUrl: string }) {
           >
             {menuOpen ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
           </button>
-          <Link href="/" className="display text-4xl tracking-[-0.02em]" onClick={() => setMenuOpen(false)}>
-            ORACK.
+          <Link href="/" aria-label="ORACK home" className="py-2 text-[28px] transition-opacity hover:opacity-80" onClick={() => setMenuOpen(false)}>
+            <LogoHorizontal title="ORACK" />
           </Link>
         </div>
 
-        <nav aria-label="Primary" className="hidden items-center gap-9 text-sm font-medium lg:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-8 text-[12px] font-medium tracking-[0.22em] uppercase lg:flex">
           <Suspense fallback={<PrimaryLinks pathname={null} />}>
             <ActivePrimaryLinks />
           </Suspense>
