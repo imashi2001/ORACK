@@ -11,7 +11,7 @@ export function WhatsAppIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-/** Small ORACK monogram used as a separator glyph (tickers, badges). */
+/** Small ORACK monogram used as a separator glyph (tickers, badges)....... */
 export function BrandGlyph(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox={MARK.viewBox} fill="currentColor" aria-hidden="true" {...props}>
