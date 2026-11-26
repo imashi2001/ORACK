@@ -4,15 +4,18 @@ import { Container } from "@/components/shop/container";
 import { cta } from "@/components/shop/cta";
 import type { PublicSettings } from "@/features/settings/queries";
 import { LogoHorizontal, LogoMark, LogoWordmark } from "@/components/brand/logo";
+import { FacebookIcon, InstagramIcon, MailIcon, TikTokIcon, WhatsAppIcon } from "@/components/shop/icons";
+import { siteConfig } from "@/config/site";
+import { formatWhatsAppDisplay } from "@/lib/whatsapp";
 
 const footerLink = "text-[#a3a3a3] transition-colors hover:text-white";
 
 export function SiteFooter({ whatsappUrl, settings }: { whatsappUrl: string; settings: PublicSettings }) {
   const socials = [
-    { label: "Instagram", href: settings.instagramUrl },
-    { label: "TikTok", href: settings.tiktokUrl },
-    { label: "Facebook", href: settings.facebookUrl },
-  ].filter((s): s is { label: string; href: string } => !!s.href);
+    { label: "Instagram", href: settings.instagramUrl, icon: InstagramIcon },
+    { label: "TikTok", href: settings.tiktokUrl, icon: TikTokIcon },
+    { label: "Facebook", href: settings.facebookUrl, icon: FacebookIcon },
+  ].filter((s): s is typeof s & { href: string } => !!s.href);
 
   return (
     <footer className="border-t border-[#1d1d1d] bg-black text-white">
@@ -31,15 +34,23 @@ export function SiteFooter({ whatsappUrl, settings }: { whatsappUrl: string; set
         <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-10">
           <div className="flex flex-col gap-4">
             <LogoHorizontal className="text-[30px]" title={settings.businessName} />
-            <p className="max-w-64 text-sm leading-relaxed text-[#a3a3a3]">Minimal streetwear and custom prints, made in Sri Lanka.</p>
+            <p className="max-w-64 text-sm leading-relaxed text-[#a3a3a3]">{siteConfig.tagline}. Streetwear and custom prints in black and white.</p>
             {socials.length > 0 && (
-              <div className="-ml-2.5 flex gap-1 text-sm">
-                {socials.map((s) => (
-                  <a key={s.label} className="px-2.5 py-2 text-[#a3a3a3] hover:text-white" href={s.href} target="_blank" rel="noopener noreferrer">
-                    {s.label}
-                  </a>
+              <ul className="flex gap-2">
+                {socials.map(({ label, href, icon: Icon }) => (
+                  <li key={label}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`ORACK on ${label}`}
+                      className="flex size-11 items-center justify-center border border-[#2a2a2a] text-[#bdbdbd] transition-colors hover:border-white hover:bg-white hover:text-ink"
+                    >
+                      <Icon className="size-[18px]" />
+                    </a>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </div>
           <nav aria-label="Shop" className="flex flex-col gap-3 text-sm">
@@ -57,11 +68,15 @@ export function SiteFooter({ whatsappUrl, settings }: { whatsappUrl: string; set
           </nav>
           <div className="flex flex-col gap-3 text-sm text-[#a3a3a3]">
             <span className="eyebrow mb-1.5 text-[#8f8f8f]">Contact</span>
-            {settings.whatsappNumber && <span>WhatsApp: {settings.whatsappNumber}</span>}
+            {settings.whatsappNumber && (
+              <a className={`${footerLink} inline-flex items-center gap-2`} href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                <WhatsAppIcon className="size-4" /> {formatWhatsAppDisplay(settings.whatsappNumber)}
+              </a>
+            )}
             {settings.contactPhone && <span>Phone: {settings.contactPhone}</span>}
             {settings.contactEmail && (
-              <a className={footerLink} href={`mailto:${settings.contactEmail}`}>
-                {settings.contactEmail}
+              <a className={`${footerLink} inline-flex items-center gap-2 break-all`} href={`mailto:${settings.contactEmail}`}>
+                <MailIcon className="size-4 shrink-0" /> {settings.contactEmail}
               </a>
             )}
             {settings.address && <span className="whitespace-pre-line">{settings.address}</span>}
@@ -73,7 +88,7 @@ export function SiteFooter({ whatsappUrl, settings }: { whatsappUrl: string; set
             <LogoMark className="w-[18%] shrink-0 text-white" />
             <LogoWordmark className="w-full text-white" />
           </div>
-          <span className="marker absolute top-0 right-[2%] rotate-[-6deg] text-[clamp(16px,2vw,26px)] text-[#a3a3a3]">wear your identity</span>
+          <span className="marker absolute top-0 right-[2%] rotate-[-6deg] text-[clamp(16px,2vw,26px)] text-[#a3a3a3]">live bold. wear ORACK</span>
         </div>
 
         <div className="eyebrow flex flex-wrap justify-between gap-4 border-t border-[#1d1d1d] pt-6 text-[#8f8f8f]">

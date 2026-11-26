@@ -145,7 +145,7 @@
 }
 
 @layer components {
-  /* Heavy condensed italic display type, e.g. "WEAR YOUR IDENTITY." */
+  /* Heavy condensed italic display type, e.g. "LIVE BOLD." */
   .display {
     font-family: var(--font-display);
     font-stretch: 70%;
@@ -154,6 +154,31 @@
     text-transform: uppercase;
     letter-spacing: -0.01em;
     line-height: 0.86;
+  }
+  /* Minimal street poster type (hero). Upright, tall and tight. */
+  .street {
+    font-family: var(--font-anton), var(--font-display), sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    line-height: 0.88;
+  }
+  /* Slow push-in on the active hero photo. */
+  .hero-zoom {
+    animation: hero-zoom 9s ease-out forwards;
+  }
+  @keyframes hero-zoom {
+    from {
+      transform: scale(1.08);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-zoom {
+      animation: none;
+    }
   }
   /* Small monospaced label. */
   .eyebrow {

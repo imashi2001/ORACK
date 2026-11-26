@@ -2,6 +2,7 @@ import { Container } from "@/components/shop/container";
 import { CategoryTiles } from "@/features/home/components/category-tiles";
 import { CustomizeBand } from "@/features/home/components/customize-band";
 import { Hero } from "@/features/home/components/hero";
+import { getHeroSlides } from "@/features/hero/queries";
 import { HowOrdering, Story, ValueProps } from "@/features/home/components/info-sections";
 import { Lookbook } from "@/features/home/components/lookbook";
 import { Reveal } from "@/components/shop/reveal";
@@ -14,11 +15,11 @@ import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
 
 export default async function HomePage() {
-  const [featured, newArrivals, all, categories] = await Promise.all([getFeaturedProducts(), getNewArrivals(), getProducts(), getCategories()]);
+  const [featured, newArrivals, all, categories, heroSlides] = await Promise.all([getFeaturedProducts(), getNewArrivals(), getProducts(), getCategories(), getHeroSlides()]);
 
   return (
     <>
-      <Hero />
+      <Hero slides={heroSlides} />
       <Marquee />
       <CategoryTiles />
 

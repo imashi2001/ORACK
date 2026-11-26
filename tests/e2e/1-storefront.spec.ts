@@ -6,7 +6,7 @@ test.describe("storefront", () => {
     const errors: string[] = [];
     page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText(/Wear your/i);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/Live bold/i);
     await expect(page.getByRole("heading", { name: "Featured collection" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Classic Oversized Tee" }).first()).toBeVisible();
     expect(errors, `console errors: ${errors.join("\n")}`).toEqual([]);

@@ -19,6 +19,13 @@ export function toWhatsAppDigits(number: string): string {
   return digits;
 }
 
+/** "94761889266" → "+94 76 188 9266" for display. Other formats are shown as given. */
+export function formatWhatsAppDisplay(number: string): string {
+  const d = toWhatsAppDigits(number);
+  const m = /^94(\d{2})(\d{3})(\d{4})$/.exec(d);
+  return m ? `+94 ${m[1]} ${m[2]} ${m[3]}` : number;
+}
+
 export const generalEnquiryMessage = "Hi ORACK! I have a question.";
 
 export interface OrderMessageInput {

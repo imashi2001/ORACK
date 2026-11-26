@@ -3,9 +3,9 @@ import type { MetadataRoute } from "next";
 /** Lets phones "Add to Home Screen" with the ORACK icon and colours. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "ORACK — Wear your identity",
+    name: "ORACK — Live Bold. Wear ORACK",
     short_name: "ORACK",
-    description: "Minimal black-and-white streetwear from Sri Lanka.",
+    description: "Black-and-white streetwear. Live Bold. Wear ORACK.",
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

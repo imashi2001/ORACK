@@ -400,3 +400,20 @@ model RateLimit {
   @@id([key, windowStart])
   @@index([windowStart])
 }
+
+/// Full-bleed homepage hero images, uploaded in Admin → Homepage (public R2 bucket).
+model HeroSlide {
+  id          String   @id @default(cuid())
+  objectKey   String   @unique
+  url         String
+  altText     String
+  /// CSS object-position keyword used to keep the subject in frame on narrow screens.
+  focus       String   @default("center")
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  sizeBytes   Int?
+  mimeType    String?
+  createdAt   DateTime @default(now())
+
+  @@index([isActive, sortOrder])
+}

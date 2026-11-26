@@ -33,12 +33,12 @@ export async function getPublicSettings(): Promise<PublicSettings> {
   return {
     businessName: row?.businessName ?? siteConfig.name,
     whatsappNumber: row?.whatsappNumber || siteConfig.whatsappNumber,
-    contactEmail: row?.contactEmail ?? null,
+    contactEmail: row?.contactEmail || siteConfig.contactEmail,
     contactPhone: row?.contactPhone ?? null,
     address: row?.address ?? null,
-    instagramUrl: row?.instagramUrl ?? null,
-    facebookUrl: row?.facebookUrl ?? null,
-    tiktokUrl: row?.tiktokUrl ?? null,
+    instagramUrl: row?.instagramUrl || siteConfig.social.instagram,
+    facebookUrl: row?.facebookUrl || siteConfig.social.facebook,
+    tiktokUrl: row?.tiktokUrl || siteConfig.social.tiktok,
     deliveryInfo: row?.deliveryInfo ?? null,
     announcement,
   };

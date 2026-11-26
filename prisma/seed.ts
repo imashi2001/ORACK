@@ -105,7 +105,11 @@ async function main() {
     create: {
       id: 1,
       businessName: "ORACK",
-      whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "",
+      whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "94761889266",
+      contactEmail: "onlyorack@gmail.com",
+      instagramUrl: "https://www.instagram.com/orack.clothing",
+      facebookUrl: "https://www.facebook.com/share/1FoFXcPRoE/",
+      tiktokUrl: "https://www.tiktok.com/@orack42",
       announcementText: "Islandwide delivery across Sri Lanka · Order in minutes via WhatsApp · Custom prints on request",
       announcementEnabled: true,
     },

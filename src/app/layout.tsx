@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Inter, JetBrains_Mono, Permanent_Marker } from "next/font/google";
+import { Anton, Archivo, Inter, JetBrains_Mono, Permanent_Marker } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -8,6 +8,13 @@ const archivo = Archivo({
   subsets: ["latin"],
   style: ["normal", "italic"],
   axes: ["wdth"],
+});
+
+// Tall, tight, no-nonsense poster type for the hero headline.
+const anton = Anton({
+  variable: "--font-anton",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 const inter = Inter({
@@ -47,7 +54,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${archivo.variable} ${inter.variable} ${jetbrains.variable} ${marker.variable} h-full`}>
+    <html lang="en" className={`${archivo.variable} ${anton.variable} ${inter.variable} ${jetbrains.variable} ${marker.variable} h-full`}>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );

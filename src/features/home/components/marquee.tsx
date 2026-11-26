@@ -2,8 +2,8 @@ import { LogoWordmark } from "@/components/brand/logo";
 import { BrandGlyph } from "@/components/shop/icons";
 import { cn } from "@/lib/utils";
 
-const TOP = ["Wear your identity", "T-Shirts", "Hoodies", "Custom designs", "ORACK", "Islandwide delivery"];
-const BOTTOM = ["New drop", "Order on WhatsApp", "Made in Sri Lanka", "Oversized fits", "Print your idea", "ORACK"];
+const TOP = ["Live bold", "T-Shirts", "Hoodies", "Custom designs", "ORACK", "Islandwide delivery"];
+const BOTTOM = ["Wear ORACK", "Order on WhatsApp", "Made in Sri Lanka", "Oversized fits", "Print your idea", "ORACK"];
 
 function Band({ words, dark, reverse, rotate }: { words: string[]; dark?: boolean; reverse?: boolean; rotate: string }) {
   const items = [...words, ...words];

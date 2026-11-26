@@ -82,7 +82,7 @@ export function Story() {
         <div className="flex flex-col gap-6">
           <SectionHeading dark id="story-heading" index="[06]" eyebrow="About us" title="The ORACK story." ghost="ORACK" note="wear it loud" />
           <p className="max-w-[540px] text-lg leading-relaxed text-[#c9c9c9]">
-            A streetwear brand built for self-expression. ORACK blends minimal design, premium quality and custom creativity to help you wear your identity, your way.
+            A streetwear brand built for self-expression. ORACK blends minimal design, premium quality and custom creativity for people who live bold. Wear ORACK, your way.
           </p>
           <div>
             <Link href="/products" className={cta({ tone: "outline-light" })}>
