@@ -66,14 +66,15 @@ export function Hero({ slides }: { slides: HeroSlideView[] }) {
                 quality={75}
                 loading={i === 0 ? "eager" : "lazy"}
                 fetchPriority={i === 0 ? "high" : "auto"}
-                className={cn("object-cover", i === current && "hero-zoom")}
+                className={cn("object-cover", s.monochrome && "grayscale", i === current && "hero-zoom")}
                 style={{ objectPosition: s.focus }}
               />
             </div>
           ))}
-          {/* Keep the type readable on any photo, darkest where the text sits. */}
-          <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(10,10,10,0.92)_0%,rgba(10,10,10,0.55)_32%,rgba(10,10,10,0.08)_62%,rgba(10,10,10,0.35)_100%)]" />
-          <div aria-hidden="true" className="absolute inset-0 hidden bg-[linear-gradient(to_right,rgba(10,10,10,0.55)_0%,transparent_55%)] md:block" />
+          {/* Shade only where it's needed: under the header and behind the bottom-left type, so the photo stays clear. */}
+          <div aria-hidden="true" className="absolute inset-x-0 top-0 h-1/4 bg-[linear-gradient(to_bottom,rgba(10,10,10,0.5),transparent)]" />
+          <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(10,10,10,0.9)_0%,rgba(10,10,10,0.55)_30%,transparent_62%)] md:bg-[linear-gradient(to_top,rgba(10,10,10,0.8)_0%,rgba(10,10,10,0.35)_28%,transparent_50%)]" />
+          <div aria-hidden="true" className="absolute inset-0 hidden bg-[radial-gradient(ellipse_62%_75%_at_8%_100%,rgba(10,10,10,0.82)_0%,rgba(10,10,10,0.5)_45%,transparent_80%)] md:block" />
         </div>
       ) : (
         <div aria-hidden="true" className="absolute inset-0 -z-10">
@@ -91,13 +92,20 @@ export function Hero({ slides }: { slides: HeroSlideView[] }) {
         <rect width="100%" height="100%" filter="url(#hero-grain)" />
       </svg>
 
-      <Container className="flex w-full flex-col justify-end gap-8 pt-24 pb-28">
-        <h1 className="street text-[clamp(64px,12.5vw,208px)]">
-          <span className="animate-in fade-in slide-in-from-bottom-6 block duration-700">Live bold.</span>
-          <span className="stroke-light animate-in fade-in slide-in-from-bottom-6 block fill-mode-both delay-150 duration-700">Wear ORACK.</span>
-        </h1>
+      <Container className="flex w-full flex-col justify-end gap-7 pt-24 pb-28 sm:pb-24">
+        <div className="flex flex-col gap-4">
+          <p className="eyebrow animate-in fade-in flex items-center gap-3 text-white/80 duration-700">
+            <span aria-hidden="true" className="h-px w-8 bg-white/70" />
+            Streetwear
+          </p>
+          <h1 className="street text-[clamp(50px,5.4vw,100px)] [text-shadow:0_2px_28px_rgba(0,0,0,0.35)]">
+            <span className="animate-in fade-in slide-in-from-bottom-4 block duration-700">Live bold.</span>
+            {/* Outlined type reads well on plain black but gets lost on a busy photo. */}
+            <span className={cn("animate-in fade-in slide-in-from-bottom-4 block fill-mode-both delay-150 duration-700", count === 0 && "stroke-light")}>Wear ORACK.</span>
+          </h1>
+        </div>
 
-        <div className="flex flex-wrap items-end justify-between gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-6">
           <div className="animate-in fade-in grid w-full grid-cols-2 gap-3 fill-mode-both delay-300 duration-700 sm:flex sm:w-auto">
             <Link href="/products" className={cn(cta({ tone: "light" }), "justify-center px-4")}>
               Shop now <ArrowRightIcon className="arrow" />

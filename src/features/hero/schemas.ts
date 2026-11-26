@@ -18,10 +18,12 @@ export const attachHeroSchema = z.object({
   objectKey: z.string().min(1).max(300),
   altText: z.string().trim().max(200),
   focus: z.enum(HERO_FOCUS),
+  monochrome: z.boolean(),
 });
 
 export const updateHeroSchema = z.object({
   altText: z.string().trim().max(200),
   focus: z.enum(HERO_FOCUS),
+  monochrome: z.boolean(),
   isActive: z.boolean(),
 });

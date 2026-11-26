@@ -29,7 +29,7 @@ export async function attachHeroImage(input: unknown): Promise<ActionResult> {
   if (!auth.ok) return auth;
   const parsed = attachHeroSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Invalid image details." };
-  const { objectKey, altText, focus } = parsed.data;
+  const { objectKey, altText, focus, monochrome } = parsed.data;
   // Only keys we issued, and only once the upload really exists in the bucket.
   if (!objectKey.startsWith(PREFIX) || objectKey.includes("..")) return { ok: false, error: "Invalid image." };
   const head = await headObject("public", objectKey);
@@ -38,7 +38,7 @@ export async function attachHeroImage(input: unknown): Promise<ActionResult> {
   const prisma = getPrisma();
   const last = await prisma.heroSlide.aggregate({ _max: { sortOrder: true } });
   const slide = await prisma.heroSlide.create({
-    data: { objectKey, url: publicUrlFor(objectKey), altText: altText || "ORACK streetwear", focus, sortOrder: (last._max.sortOrder ?? -1) + 1, sizeBytes: head.size, mimeType: head.contentType },
+    data: { objectKey, url: publicUrlFor(objectKey), altText: altText || "ORACK streetwear", focus, monochrome, sortOrder: (last._max.sortOrder ?? -1) + 1, sizeBytes: head.size, mimeType: head.contentType },
   });
   await logActivity({ userId: auth.user.id, action: "hero.add", entityType: "HeroSlide", entityId: slide.id });
   refreshStorefront(HERO_TAG);

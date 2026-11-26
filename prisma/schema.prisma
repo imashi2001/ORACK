@@ -409,6 +409,8 @@ model HeroSlide {
   altText     String
   /// CSS object-position keyword used to keep the subject in frame on narrow screens.
   focus       String   @default("center")
+  /// Show the photo in black and white to match the monochrome brand.
+  monochrome  Boolean  @default(false)
   sortOrder   Int      @default(0)
   isActive    Boolean  @default(true)
   sizeBytes   Int?

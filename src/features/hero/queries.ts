@@ -10,6 +10,7 @@ export interface HeroSlideView {
   url: string;
   altText: string;
   focus: HeroFocus;
+  monochrome: boolean;
 }
 
 /** Active hero images for the homepage, in display order. */
@@ -20,7 +21,7 @@ export async function getHeroSlides(): Promise<HeroSlideView[]> {
   const rows = await getPrisma().heroSlide.findMany({
     where: { isActive: true },
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    select: { id: true, url: true, altText: true, focus: true },
+    select: { id: true, url: true, altText: true, focus: true, monochrome: true },
   });
   return rows.map((r) => ({ ...r, focus: r.focus as HeroFocus }));
 }

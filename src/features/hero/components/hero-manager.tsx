@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ArrowDownIcon, ArrowUpIcon, EyeIcon, EyeOffIcon, Trash2Icon, UploadIcon } from "lucide-react";
 import { adminButton, adminInput, adminLabel, Badge, Card, FormError } from "@/features/admin/components/ui";
+import { cn } from "@/lib/utils";
 import { attachHeroImage, deleteHeroSlide, moveHeroSlide, requestHeroUpload, updateHeroSlide } from "../actions";
 import type { AdminHeroSlide } from "../queries";
 import { HERO_FOCUS, HERO_IMAGE_TYPES, MAX_HERO_IMAGE_BYTES, MAX_HERO_SLIDES, type HeroFocus } from "../schemas";
@@ -17,6 +18,7 @@ export function HeroManager({ slides, storageReady }: { slides: AdminHeroSlide[]
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [focus, setFocus] = useState<HeroFocus>("center");
+  const [monochrome, setMonochrome] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -45,7 +47,7 @@ export function HeroManager({ slides, storageReady }: { slides: AdminHeroSlide[]
           return setError("Upload to storage failed. Check the R2 CORS settings.");
         }
         setStatus(`Saving${label}…`);
-        const saved = await attachHeroImage({ objectKey: signed.data.objectKey, altText: "ORACK streetwear", focus });
+        const saved = await attachHeroImage({ objectKey: signed.data.objectKey, altText: "ORACK streetwear", focus, monochrome });
         if (!saved.ok) {
           setStatus(null);
           return setError(saved.error);
@@ -83,7 +85,7 @@ export function HeroManager({ slides, storageReady }: { slides: AdminHeroSlide[]
 
         {storageReady ? (
           room > 0 ? (
-            <div className="grid grid-cols-1 gap-4 border border-dashed border-line p-4 md:grid-cols-[1fr_180px_auto] md:items-end">
+            <div className="grid grid-cols-1 gap-4 border border-dashed border-line p-4 md:grid-cols-[1fr_160px_auto_auto] md:items-end">
               <label className="flex flex-col gap-1.5">
                 <span className={adminLabel}>Image files</span>
                 <input
@@ -104,6 +106,10 @@ export function HeroManager({ slides, storageReady }: { slides: AdminHeroSlide[]
                     </option>
                   ))}
                 </select>
+              </label>
+              <label className="flex h-10 items-center gap-2 text-sm font-semibold text-ink">
+                <input type="checkbox" checked={monochrome} onChange={(e) => setMonochrome(e.target.checked)} className="size-4 accent-ink" />
+                Black &amp; white
               </label>
               <button type="button" disabled={!files.length || pending} onClick={upload} className={adminButton({ size: "md" })}>
                 <UploadIcon /> {status ?? "Upload"}
@@ -126,18 +132,19 @@ export function HeroManager({ slides, storageReady }: { slides: AdminHeroSlide[]
 function SlideRow({ slide, index, last, pending, act }: { slide: AdminHeroSlide; index: number; last: boolean; pending: boolean; act: (fn: () => Promise<Result>) => void }) {
   const [altText, setAltText] = useState(slide.altText);
   const [focus, setFocus] = useState(slide.focus as HeroFocus);
-  const dirty = altText !== slide.altText || focus !== slide.focus;
-  const save = (isActive = slide.isActive) => act(() => updateHeroSlide(slide.id, { altText, focus, isActive }));
+  const [monochrome, setMonochrome] = useState(slide.monochrome);
+  const dirty = altText !== slide.altText || focus !== slide.focus || monochrome !== slide.monochrome;
+  const save = (isActive = slide.isActive) => act(() => updateHeroSlide(slide.id, { altText, focus, monochrome, isActive }));
 
   return (
     <li className="grid grid-cols-1 gap-4 border border-line p-3 sm:grid-cols-[220px_1fr]">
       <div className="relative aspect-[16/9] overflow-hidden bg-ink">
-        <Image src={slide.url} alt={slide.altText} fill sizes="220px" className="object-cover" style={{ objectPosition: focus }} />
+        <Image src={slide.url} alt={slide.altText} fill sizes="220px" className={cn("object-cover", monochrome && "grayscale")} style={{ objectPosition: focus }} />
         <span className="absolute top-2 left-2 bg-white px-1.5 py-0.5 font-mono text-[11px] font-semibold text-ink">0{index + 1}</span>
       </div>
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-1.5">{slide.isActive ? <Badge tone="dark">Showing</Badge> : <Badge>Hidden</Badge>}</div>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_150px]">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_150px_auto] md:items-end">
           <label className="flex flex-col gap-1.5">
             <span className={adminLabel}>Description (for screen readers)</span>
             <input className={adminInput} value={altText} maxLength={200} onChange={(e) => setAltText(e.target.value)} />
@@ -152,11 +159,15 @@ function SlideRow({ slide, index, last, pending, act }: { slide: AdminHeroSlide;
               ))}
             </select>
           </label>
+          <label className="flex h-10 items-center gap-2 text-sm font-semibold text-ink">
+            <input type="checkbox" checked={monochrome} onChange={(e) => setMonochrome(e.target.checked)} className="size-4 accent-ink" />
+            Black &amp; white
+          </label>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {dirty && (
             <button type="button" disabled={pending} onClick={() => save()} className={adminButton({ size: "sm" })}>
-              Save
+              Save changes
             </button>
           )}
           <button type="button" disabled={pending || index === 0} onClick={() => act(() => moveHeroSlide(slide.id, "up"))} className={adminButton({ variant: "secondary", size: "sm" })} aria-label="Move earlier">
