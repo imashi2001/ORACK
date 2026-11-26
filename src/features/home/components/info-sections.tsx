@@ -3,6 +3,8 @@ import { ArrowRightIcon, LayersIcon, ShieldCheckIcon, TruckIcon } from "lucide-r
 import { cta } from "@/components/shop/cta";
 import { Container } from "@/components/shop/container";
 import { WhatsAppIcon } from "@/components/shop/icons";
+import { Reveal } from "@/components/shop/reveal";
+import { SectionHeading } from "@/components/shop/street";
 
 const ORDER_STEPS = [
   { title: "Add to bag", body: "Pick your size and colour. Stock is checked live." },
@@ -13,26 +15,21 @@ const ORDER_STEPS = [
 
 export function HowOrdering() {
   return (
-    <section id="how-it-works" aria-labelledby="how-heading" className="scroll-mt-24 border-t border-[#e0e0dd] bg-paper py-[clamp(64px,8vw,112px)]">
+    <section id="how-it-works" aria-labelledby="how-heading" className="scroll-mt-24 overflow-hidden border-t border-[#e0e0dd] bg-paper py-[clamp(64px,8vw,112px)]">
       <Container className="flex flex-col gap-12">
         <div className="flex flex-wrap items-end justify-between gap-6">
-          <div className="flex flex-col gap-3.5">
-            <span className="eyebrow text-xs text-smoke">No card. No account.</span>
-            <h2 id="how-heading" className="display text-[clamp(48px,6vw,84px)]">
-              Ordering, simplified.
-            </h2>
-          </div>
+          <SectionHeading id="how-heading" index="[05]" eyebrow="No card. No account." title="Ordering, simplified." ghost="HOW TO" />
           <p className="max-w-[420px] leading-relaxed text-[#4a4a4a]">
             Place your order here, then confirm it with us in a quick WhatsApp chat. Payment and delivery details are agreed in that chat.
           </p>
         </div>
         <ol className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] border-t-2 border-ink">
           {ORDER_STEPS.map((s, i) => (
-            <li key={s.title} className="flex flex-col gap-3.5 pt-7 pr-7 pb-2">
-              <span className="display text-[64px] text-[#858582]">0{i + 1}</span>
+            <Reveal as="li" key={s.title} delay={i * 90} className="group/step flex flex-col gap-3.5 pt-7 pr-7 pb-2">
+              <span className="display stroke-dark text-[72px] transition-colors duration-300 group-hover/step:text-ink">0{i + 1}</span>
               <h3 className="text-lg font-bold">{s.title}</h3>
               <p className="text-[15px] leading-relaxed text-[#4a4a4a]">{s.body}</p>
-            </li>
+            </Reveal>
           ))}
         </ol>
       </Container>
@@ -78,10 +75,7 @@ export function Story() {
           <span className="eyebrow absolute bottom-4.5 left-5 text-[#8f8f8f]">Est. Sri Lanka</span>
         </div>
         <div className="flex flex-col gap-6">
-          <span className="eyebrow text-xs text-[#a3a3a3]">About us</span>
-          <h2 id="story-heading" className="display text-[clamp(56px,7vw,104px)]">
-            The ORACK story.
-          </h2>
+          <SectionHeading dark id="story-heading" index="[06]" eyebrow="About us" title="The ORACK story." ghost="ORACK" note="wear it loud" />
           <p className="max-w-[540px] text-lg leading-relaxed text-[#c9c9c9]">
             A streetwear brand built for self-expression. ORACK blends minimal design, premium quality and custom creativity to help you wear your identity, your way.
           </p>

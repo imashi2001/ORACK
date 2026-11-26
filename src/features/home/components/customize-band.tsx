@@ -7,6 +7,7 @@ import { cta } from "@/components/shop/cta";
 import { Container } from "@/components/shop/container";
 import { GarmentArt } from "@/features/products/components/garment-art";
 import type { PrintStyle } from "@/features/products/types";
+import { SectionHeading, Sticker, Tape } from "@/components/shop/street";
 import { cn } from "@/lib/utils";
 
 const PLACES: { id: string; label: string; print: PrintStyle }[] = [
@@ -32,7 +33,12 @@ export function CustomizeBand() {
           <div className="relative flex aspect-square items-center justify-center bg-[#131313] bg-[linear-gradient(#1e1e1e_1px,transparent_1px),linear-gradient(90deg,#1e1e1e_1px,transparent_1px)] bg-[size:40px_40px] p-[10%]">
             <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_50%_48%,rgba(120,120,118,0.45),rgba(19,19,19,0)_60%)]" />
             <GarmentArt kind="tee" tone="charcoal" print={place.print} shadow={false} className="relative w-full drop-shadow-[0_30px_40px_rgba(0,0,0,0.6)]" />
-            <span className="eyebrow absolute top-5 left-5 text-[#a3a3a3]">Live preview</span>
+            <Tape className="-top-3 left-[40%]" rotate={-4} />
+            <span className="absolute top-5 left-5">
+              <Sticker tone="light" rotate={-3}>
+                Live preview
+              </Sticker>
+            </span>
             <span className="eyebrow absolute top-5 right-5" aria-live="polite">
               Placement · {place.label}
             </span>
@@ -56,12 +62,21 @@ export function CustomizeBand() {
         </div>
 
         <div className="flex flex-col gap-7">
-          <span className="eyebrow text-xs text-[#a3a3a3]">Custom studio</span>
-          <h2 id="customize-heading" className="display text-[clamp(56px,7vw,104px)]">
-            Customize
-            <br />
-            your T-shirt.
-          </h2>
+          <SectionHeading
+            dark
+            id="customize-heading"
+            index="[02]"
+            eyebrow="Custom studio"
+            ghost="STUDIO"
+            note="upload your own art"
+            title={
+              <>
+                Customize
+                <br />
+                your T-shirt.
+              </>
+            }
+          />
           <p className="max-w-[520px] text-lg leading-relaxed text-[#c9c9c9]">
             Bring your ideas to life. Choose the colour, size and placement, upload your own design, and we&apos;ll come back with a quote.
           </p>

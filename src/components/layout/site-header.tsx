@@ -89,7 +89,8 @@ export function SiteHeader({ whatsappUrl }: { whatsappUrl: string }) {
           </a>
           <button type="button" className={iconBtn} aria-label={`Open bag, ${count} items`} onClick={() => setOpen(true)}>
             <ShoppingBagIcon className="size-5" />
-            <span className="absolute top-1 right-0.5 min-w-4.5 rounded-full bg-white px-1.5 text-center text-[10px] leading-4.5 font-bold text-ink">
+            {/* Re-keyed on change so the count "bumps" when something is added. */}
+            <span key={count} className="animate-bump absolute top-1 right-0.5 min-w-4.5 rounded-full bg-white px-1.5 text-center text-[10px] leading-4.5 font-bold text-ink">
               {count}
             </span>
           </button>

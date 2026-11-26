@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowRightIcon } from "lucide-react";
+import { Reveal } from "@/components/shop/reveal";
+import { SectionHeading } from "@/components/shop/street";
 import { cn } from "@/lib/utils";
 import type { CategoryRef, Product } from "../types";
 import { ProductCard } from "./product-card";
@@ -20,12 +22,7 @@ export function FeaturedCollection({ featured, pool, categories }: { featured: P
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-wrap items-end justify-between gap-6">
-        <div className="flex flex-col gap-3.5">
-          <span className="eyebrow text-xs text-smoke">Drop 01 — Essentials</span>
-          <h2 id="featured-heading" className="display text-[clamp(48px,6vw,84px)]">
-            Featured collection
-          </h2>
-        </div>
+        <SectionHeading id="featured-heading" index="[01]" eyebrow="Drop 01 — Essentials" title="Featured collection" ghost="DROP 01" />
         <div className="flex flex-wrap items-center gap-6">
           <div role="group" aria-label="Filter by category" className="flex flex-wrap gap-2">
             {tabs.map((t) => (
@@ -50,8 +47,10 @@ export function FeaturedCollection({ featured, pool, categories }: { featured: P
       </div>
       {items.length ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-x-6 gap-y-7">
-          {items.map((p) => (
-            <ProductCard key={p.id} product={p} />
+          {items.map((p, i) => (
+            <Reveal key={p.id} delay={i * 70}>
+              <ProductCard product={p} priority={i < 2} />
+            </Reveal>
           ))}
         </div>
       ) : (

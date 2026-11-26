@@ -26,5 +26,5 @@ export async function addTeeToBag(page: Page) {
       break;
     }
   }
-  await page.getByRole("button", { name: /Add to bag/ }).click();
+  await page.getByRole("button", { name: /Add to bag/ }).first().click();
 }

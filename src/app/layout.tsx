@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Inter, JetBrains_Mono } from "next/font/google";
+import { Archivo, Inter, JetBrains_Mono, Permanent_Marker } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -13,6 +13,13 @@ const archivo = Archivo({
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+// Hand-drawn accent for small street-style notes only.
+const marker = Permanent_Marker({
+  variable: "--font-marker",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 const jetbrains = JetBrains_Mono({
@@ -40,7 +47,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${archivo.variable} ${inter.variable} ${jetbrains.variable} h-full`}>
+    <html lang="en" className={`${archivo.variable} ${inter.variable} ${jetbrains.variable} ${marker.variable} h-full`}>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );

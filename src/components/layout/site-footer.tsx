@@ -67,6 +67,11 @@ export function SiteFooter({ whatsappUrl, settings }: { whatsappUrl: string; set
           </div>
         </div>
 
+        <div aria-hidden="true" className="relative -mx-2 overflow-hidden select-none">
+          <span className="display block text-center text-[clamp(96px,24vw,360px)] leading-[0.8] text-white">{settings.businessName}.</span>
+          <span className="marker absolute right-[6%] bottom-[18%] rotate-[-8deg] text-[clamp(16px,2vw,26px)] text-[#a3a3a3]">wear your identity</span>
+        </div>
+
         <div className="eyebrow flex flex-wrap justify-between gap-4 border-t border-[#1d1d1d] pt-6 text-[#8f8f8f]">
           <span>© 2026 {settings.businessName}. All rights reserved.</span>
           <span>Prices in LKR · Pay on confirmation</span>

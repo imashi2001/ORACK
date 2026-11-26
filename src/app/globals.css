@@ -45,9 +45,40 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 
   --animate-marquee: marquee 40s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 46s linear infinite;
+  --animate-spin-slow: spin 18s linear infinite;
+  --animate-bump: bump 0.45s cubic-bezier(0.2, 0.8, 0.2, 1.4);
+  --animate-progress: progress linear forwards;
   @keyframes marquee {
     to {
       transform: translateX(-50%);
+    }
+  }
+  @keyframes marquee-reverse {
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  @keyframes bump {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.35);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
     }
   }
 }
@@ -85,6 +116,22 @@
   }
   body {
     @apply bg-paper text-ink antialiased;
+    /* Decorative rotated elements must never cause sideways scrolling (clip keeps sticky working). */
+    overflow-x: clip;
+  }
+  ::selection {
+    background: #0a0a0a;
+    color: #fff;
+  }
+  /* Film-grain texture over the whole site: purely decorative. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   }
   :focus-visible {
     outline: 2px solid #8a8a8a;
@@ -119,10 +166,65 @@
     color: transparent;
     -webkit-text-stroke: 1px rgb(255 255 255 / 0.09);
   }
+  /* Outlined display type (hero second line, ghost section words). */
+  .stroke-light {
+    color: transparent;
+    -webkit-text-stroke: 2px #fff;
+  }
+  .stroke-dark {
+    color: transparent;
+    -webkit-text-stroke: 1.5px #0a0a0a;
+  }
+  .stroke-ghost {
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(10 10 10 / 0.12);
+  }
+  /* Hand-written accent. */
+  .marker {
+    font-family: var(--font-marker), cursive;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  /* Masking-tape strip with torn ends. */
+  .tape {
+    background: rgb(244 244 242 / 0.86);
+    clip-path: polygon(2% 0, 98% 6%, 100% 50%, 97% 100%, 3% 94%, 0 50%);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.15);
+  }
+  /* Scroll reveal: only applied to elements below the fold once JS runs. */
+  [data-reveal="pending"] {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  [data-reveal="in"] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+}
+
+/* Make room for the sticky mobile "Add to bag" bar on product pages. */
+@media (max-width: 1023px) {
+  body:has([data-sticky-buy]) .wa-fab {
+    bottom: 6.5rem;
+  }
+  body:has([data-sticky-buy]) footer {
+    padding-bottom: 5rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
+  .animate-marquee,
+  .animate-marquee-reverse,
+  .animate-spin-slow,
+  .animate-bump,
+  .animate-progress {
     animation: none;
+  }
+  [data-reveal="pending"] {
+    opacity: 1;
+    transform: none;
   }
 }

@@ -8,6 +8,7 @@ import { useCart, MAX_QTY_PER_LINE } from "@/features/cart/cart-provider";
 import { useStoreSettings } from "@/features/settings/store-settings-provider";
 import { cta } from "@/components/shop/cta";
 import { WhatsAppIcon } from "@/components/shop/icons";
+import { Sticker, Tape } from "@/components/shop/street";
 import { formatLKR } from "@/lib/format";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
@@ -108,9 +109,16 @@ export function ProductDetail({ product }: { product: Product }) {
         </div>
         <div className="relative flex aspect-[4/5] min-w-0 flex-[999_1_420px] items-center justify-center overflow-hidden bg-mist">
           {current.kind === "art" && <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,#f7f7f5_0%,rgba(233,233,230,0)_62%)]" />}
+          <Tape onLight className="-top-2.5 left-[30%]" rotate={-6} />
           {renderView(current, true)}
-          <span className="eyebrow absolute top-5 left-5 text-smoke">{current.label}</span>
-          {product.isCustomizable && <span className="eyebrow absolute top-5 right-5 bg-ink px-2 py-1.5 text-[10px] text-white">Customizable</span>}
+          <span className="eyebrow absolute top-6 left-5 text-smoke">{current.label}</span>
+          {product.isCustomizable && (
+            <span className="absolute top-6 right-5">
+              <Sticker tone="dark" rotate={4}>
+                Customizable
+              </Sticker>
+            </span>
+          )}
           <span className="eyebrow absolute bottom-5 left-5 text-smoke">
             {views.indexOf(current) + 1} / {views.length}
           </span>
@@ -157,7 +165,7 @@ export function ProductDetail({ product }: { product: Product }) {
               Size guide
             </button>
           </div>
-          <div role="group" aria-label="Size" className="grid grid-cols-[repeat(auto-fit,minmax(56px,1fr))] gap-2">
+          <div id="size-picker" role="group" aria-label="Size" className="scroll-mt-28 grid grid-cols-[repeat(auto-fit,minmax(56px,1fr))] gap-2">
             {product.sizes.map((s) => {
               const v = variantFor(s);
               const out = !v || v.stock === 0;
@@ -274,6 +282,31 @@ export function ProductDetail({ product }: { product: Product }) {
             </details>
           ))}
         </div>
+      </div>
+
+      {/* Phones: keep the main action in reach while scrolling. */}
+      <div data-sticky-buy className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-line bg-white/95 px-4 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] backdrop-blur lg:hidden">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold">{product.name}</p>
+          <p className="text-[13px] text-graphite">
+            {formatLKR(unitPrice)} · {colorName}
+            {size ? ` / ${size}` : ""}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (!selected) {
+              setNeedSize(true);
+              document.getElementById("size-picker")?.scrollIntoView({ behavior: "smooth", block: "center" });
+              return;
+            }
+            add();
+          }}
+          className={cta({ className: "min-h-12 shrink-0 px-5" })}
+        >
+          {added ? "Added" : selected ? "Add to bag" : "Choose size"}
+        </button>
       </div>
     </div>
   );
