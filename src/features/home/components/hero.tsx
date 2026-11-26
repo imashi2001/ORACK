@@ -44,7 +44,9 @@ export function Hero({ slides }: { slides: HeroSlideView[] }) {
     <section
       aria-roledescription={count > 1 ? "carousel" : undefined}
       aria-label="Live Bold. Wear ORACK"
-      className="relative isolate flex min-h-[clamp(560px,calc(100svh-104px),940px)] overflow-hidden bg-ink text-white"
+      // data-hero lets the header go transparent over this section; -mt-18 slides the photo up under it.
+      data-hero=""
+      className="relative isolate -mt-18 flex min-h-[clamp(620px,calc(100svh-36px),1000px)] overflow-hidden bg-ink text-white"
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
     >
@@ -72,7 +74,7 @@ export function Hero({ slides }: { slides: HeroSlideView[] }) {
             </div>
           ))}
           {/* Shade only where it's needed: under the header and behind the bottom-left type, so the photo stays clear. */}
-          <div aria-hidden="true" className="absolute inset-x-0 top-0 h-1/4 bg-[linear-gradient(to_bottom,rgba(10,10,10,0.5),transparent)]" />
+          <div aria-hidden="true" className="absolute inset-x-0 top-0 h-[34%] bg-[linear-gradient(to_bottom,rgba(10,10,10,0.72)_0%,rgba(10,10,10,0.35)_45%,transparent_100%)]" />
           <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(10,10,10,0.9)_0%,rgba(10,10,10,0.55)_30%,transparent_62%)] md:bg-[linear-gradient(to_top,rgba(10,10,10,0.8)_0%,rgba(10,10,10,0.35)_28%,transparent_50%)]" />
           <div aria-hidden="true" className="absolute inset-0 hidden bg-[radial-gradient(ellipse_62%_75%_at_8%_100%,rgba(10,10,10,0.82)_0%,rgba(10,10,10,0.5)_45%,transparent_80%)] md:block" />
         </div>
@@ -92,7 +94,7 @@ export function Hero({ slides }: { slides: HeroSlideView[] }) {
         <rect width="100%" height="100%" filter="url(#hero-grain)" />
       </svg>
 
-      <Container className="flex w-full flex-col justify-end gap-7 pt-24 pb-28 sm:pb-24">
+      <Container className="flex w-full flex-col justify-end gap-7 pt-36 pb-28 sm:pb-24">
         <div className="flex flex-col gap-4">
           <p className="eyebrow animate-in fade-in flex items-center gap-3 text-white/80 duration-700">
             <span aria-hidden="true" className="h-px w-8 bg-white/70" />

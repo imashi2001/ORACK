@@ -3,6 +3,8 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+/* Header sitting over the homepage hero photo at the top of the page (no menu open, not scrolled). */
+@custom-variant over-hero (&:where(body:has([data-hero]) *):not([data-solid]));
 
 @theme inline {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;

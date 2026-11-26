@@ -15,7 +15,10 @@ export default async function ShopLayout({ children }: LayoutProps<"/">) {
     <StoreSettingsProvider value={{ whatsappNumber: settings.whatsappNumber, deliveryInfo: settings.deliveryInfo }}>
       <CartProvider>
         <AnnouncementBar items={settings.announcement} />
-        <SiteHeader whatsappUrl={whatsappUrl} />
+        <SiteHeader
+          whatsappUrl={whatsappUrl}
+          socials={{ instagram: settings.instagramUrl, tiktok: settings.tiktokUrl, facebook: settings.facebookUrl, email: settings.contactEmail }}
+        />
         <main className="flex-1">{children}</main>
         <SiteFooter whatsappUrl={whatsappUrl} settings={settings} />
         <WhatsAppFab whatsappUrl={whatsappUrl} />
