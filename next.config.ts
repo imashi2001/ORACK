@@ -8,7 +8,8 @@ const r2Public = process.env.R2_PUBLIC_BASE_URL ? new URL(process.env.R2_PUBLIC_
 const r2Api = process.env.R2_ENDPOINT
   ? new URL(process.env.R2_ENDPOINT).origin
   : process.env.R2_ACCOUNT_ID
-    ? `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+    ? // Account endpoint, plus its bucket subdomains in case a client uses virtual-hosted URLs.
+      `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com https://*.${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
     : null;
 
 /**

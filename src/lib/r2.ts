@@ -24,7 +24,13 @@ function getClient(): S3Client {
   client ??= new S3Client({
     region: "auto",
     endpoint: custom || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-    forcePathStyle: !!custom,
+    // Path-style URLs (https://<account>.r2.cloudflarestorage.com/<bucket>/<key>) keep every
+    // presigned URL on one host, which is what the Content-Security-Policy allows.
+    forcePathStyle: true,
+    // Newer AWS SDKs add a CRC32 checksum to presigned URLs, computed over an EMPTY body at
+    // signing time, so R2 rejects the real browser upload. Only send checksums when required.
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
     credentials: { accessKeyId: process.env.R2_ACCESS_KEY_ID!, secretAccessKey: process.env.R2_SECRET_ACCESS_KEY! },
   });
   return client;
