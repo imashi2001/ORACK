@@ -49,7 +49,7 @@ export const FAQ: { group: string; items: { q: string; a: string; link?: { href:
     items: [
       {
         q: "How do custom designs work?",
-        a: "Choose a tee or hoodie, colour, size and print placement, describe your idea and upload reference images. We review it and send a quote on WhatsApp. Nothing is printed or charged until you accept.",
+        a: "Choose your piece, colour, size and print placement, describe your idea and upload reference images. We review it and send a quote on WhatsApp. Nothing is printed or charged until you accept.",
         link: { href: "/customize", label: "Start a custom design" },
       },
       { q: "Who can see the images I upload?", a: "Only our team. Reference images are stored privately and are never shown on the website." },

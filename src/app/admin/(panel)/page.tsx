@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Badge, Card, EmptyState, PageHeader, PanelSkeleton, StatCard } from "@/features/admin/components/ui";
 import { getDashboardData } from "@/features/admin/dashboard-queries";
+import { StorefrontStatus } from "@/features/admin/storefront-status";
 import { customizationStatusMeta, formatDateTime, orderStatusMeta, paymentStatusMeta } from "@/features/admin/labels";
 import { requireAdmin } from "@/features/auth/dal";
 import { formatLKR } from "@/lib/format";
@@ -36,6 +37,8 @@ async function Dashboard({ searchParams }: Pick<PageProps<"/admin">, "searchPara
         <StatCard label="Awaiting payment" value={formatLKR(d.sales.openUnpaid)} hint="Open orders not yet paid" />
         <StatCard label="Last 30 days" value={formatLKR(d.sales.last30Total)} hint={`${d.sales.last30Count} orders placed (excl. cancelled)`} />
       </div>
+
+      <StorefrontStatus />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[2fr_1fr]">
         <Card title="Recent orders" actions={<Link href="/admin/orders" className="text-[13px] font-semibold underline">View all</Link>}>

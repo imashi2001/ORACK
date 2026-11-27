@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageBody, PageHero, Section } from "@/components/shop/info-page";
+import { getShopCategories } from "@/features/products/queries";
 import { getPublicSettings } from "@/features/settings/queries";
 import { MEASURE_TIPS, SizeChart } from "@/features/settings/size-chart";
 import { hasMeasurements, SIZE_GUIDE_KINDS } from "@/features/settings/size-guide";
@@ -8,12 +9,14 @@ import { buildWhatsAppUrl } from "@/lib/whatsapp";
 export const metadata: Metadata = {
   alternates: { canonical: "/size-guide" },
   title: "Size guide",
-  description: "ORACK T-shirt and hoodie measurements, how to measure, and how our oversized fits are meant to sit.",
+  description: "ORACK garment measurements, how to measure, and how our oversized fits are meant to sit.",
 };
 
 export default async function SizeGuidePage() {
-  const settings = await getPublicSettings();
-  const charts = SIZE_GUIDE_KINDS.filter(({ kind }) => hasMeasurements(settings.sizeGuide[kind]));
+  const [settings, categories] = await Promise.all([getPublicSettings(), getShopCategories()]);
+  // Only garment types that are currently on sale, and only once measurements have been entered.
+  const onSale = new Set(categories.map((c) => (c.slug.includes("hood") ? "hoodie" : "tee")));
+  const charts = SIZE_GUIDE_KINDS.filter(({ kind }) => onSale.has(kind) && hasMeasurements(settings.sizeGuide[kind]));
   const askUrl = buildWhatsAppUrl("Hi ORACK! Can you help me choose a size?", settings.whatsappNumber);
 
   return (
@@ -49,7 +52,7 @@ export default async function SizeGuidePage() {
               <strong>Prefer it closer?</strong> Go one size down.
             </li>
             <li>
-              <strong>Between sizes?</strong> Size up for hoodies you&apos;ll layer, size down for tees you&apos;ll tuck.
+              <strong>Between sizes?</strong> Size up for a roomier drape, size down for a cleaner line.
             </li>
           </ul>
           <p>
@@ -62,7 +65,7 @@ export default async function SizeGuidePage() {
         </Section>
 
         <Section id="measure" title="How to measure">
-          <p>The easiest way: take a tee or hoodie you love the fit of, lay it flat and compare.</p>
+          <p>The easiest way: take a piece you love the fit of, lay it flat and compare.</p>
           <ol className="mt-2 grid gap-px bg-line sm:grid-cols-3">
             {MEASURE_TIPS.map((t, i) => (
               <li key={t.title} className="flex flex-col gap-2 bg-white p-5">

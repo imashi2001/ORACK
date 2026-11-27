@@ -20,8 +20,10 @@ export interface ProductVariant {
   sku: string;
   size: string;
   colorName: string;
-  /** LKR, variant override or the product's base price */
+  /** LKR the customer pays: variant override or base price, after any discount */
   price: number;
+  /** Price before the discount; equals price when there's no discount */
+  compareAtPrice: number;
   stock: number;
 }
 
@@ -47,8 +49,12 @@ export interface Product {
   print: PrintStyle;
   /** Base price in LKR */
   price: number;
-  /** Lowest active variant price, for "from" labels */
+  /** Lowest active variant price after discount, for "from" labels */
   minPrice: number;
+  /** Lowest active variant price before discount */
+  compareAtMinPrice: number;
+  /** Whole percent off, or null */
+  discountPercent: number | null;
   colours: ColourOption[];
   sizes: string[];
   variants: ProductVariant[];

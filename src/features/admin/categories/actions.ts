@@ -14,6 +14,7 @@ const categorySchema = z.object({
   name: z.string().trim().min(2, "Name is too short").max(60),
   slug: z.string().trim().min(2).max(60).regex(SLUG_RE, "Use lowercase letters, numbers and hyphens"),
   description: z.string().trim().max(300).optional(),
+  tagline: z.string().trim().max(80).optional(),
   sortOrder: z.number().int().min(0).max(999),
   isActive: z.boolean(),
 });
@@ -23,7 +24,7 @@ export async function saveCategory(id: string | null, input: unknown): Promise<A
   if (!auth.ok) return auth;
   const parsed = categorySchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Please fix the highlighted fields.", fieldErrors: z.flattenError(parsed.error).fieldErrors };
-  const data = { ...parsed.data, description: parsed.data.description || null };
+  const data = { ...parsed.data, description: parsed.data.description || null, tagline: parsed.data.tagline || null };
   try {
     const cat = id ? await getPrisma().category.update({ where: { id }, data }) : await getPrisma().category.create({ data });
     await logActivity({ userId: auth.user.id, action: id ? "category.update" : "category.create", entityType: "Category", entityId: cat.id, metadata: { name: cat.name } });

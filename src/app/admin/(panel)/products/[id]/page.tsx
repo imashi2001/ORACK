@@ -56,6 +56,7 @@ async function EditProduct({ params, searchParams }: Pick<PageProps<"/admin/prod
           description: product.description,
           categoryId: product.categoryId,
           basePrice: product.basePrice,
+          discountPercent: product.discountPercent,
           status: product.status,
           isFeatured: product.isFeatured,
           isNewArrival: product.isNewArrival,

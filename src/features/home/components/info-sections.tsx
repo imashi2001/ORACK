@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightIcon, LayersIcon, ShieldCheckIcon, TruckIcon } from "lucide-react";
 import { cta } from "@/components/shop/cta";
@@ -6,12 +7,25 @@ import { WhatsAppIcon } from "@/components/shop/icons";
 import { Reveal } from "@/components/shop/reveal";
 import { SectionHeading } from "@/components/shop/street";
 import { LogoMark, LogoStacked } from "@/components/brand/logo";
+import type { SiteImageView } from "@/features/site-images/slots";
 
 const ORDER_STEPS = [
-  { title: "Add to bag", body: "Pick your size and colour. Stock is checked live." },
-  { title: "Place your order", body: "Add your name, number and address. You get an order reference instantly." },
-  { title: "Send it on WhatsApp", body: "We open the chat with your order already written. Just tap send." },
-  { title: "We confirm & deliver", body: "We confirm it with you, pack it, and ship it islandwide." },
+  {
+    title: "Add to bag",
+    body: "Pick your size and colour. Stock is checked live.",
+  },
+  {
+    title: "Place your order",
+    body: "Add your name, number and address. You get an order reference instantly.",
+  },
+  {
+    title: "Send it on WhatsApp",
+    body: "We open the chat with your order already written. Just tap send.",
+  },
+  {
+    title: "We confirm & deliver",
+    body: "We confirm it with you, pack it, and ship it islandwide.",
+  },
 ];
 
 export function HowOrdering() {
@@ -20,9 +34,7 @@ export function HowOrdering() {
       <Container className="flex flex-col gap-12">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading id="how-heading" index="[05]" eyebrow="No card. No account." title="Ordering, simplified." ghost="HOW TO" />
-          <p className="max-w-[420px] leading-relaxed text-[#4a4a4a]">
-            Place your order here, then confirm it with us in a quick WhatsApp chat. Payment and delivery details are agreed in that chat.
-          </p>
+          <p className="max-w-[420px] leading-relaxed text-[#4a4a4a]">Place your order here, then confirm it with us in a quick WhatsApp chat. Payment and delivery details are agreed in that chat.</p>
         </div>
         <ol className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] border-t-2 border-ink">
           {ORDER_STEPS.map((s, i) => (
@@ -39,10 +51,26 @@ export function HowOrdering() {
 }
 
 const PROPS = [
-  { icon: TruckIcon, title: "Islandwide delivery", body: "Get your order anywhere in Sri Lanka." },
-  { icon: ShieldCheckIcon, title: "Quality guaranteed", body: "Premium materials, lasting comfort." },
-  { icon: LayersIcon, title: "Custom designs", body: "Your style, your design, your ORACK." },
-  { icon: WhatsAppIcon, title: "Real people, real chat", body: "Every order is confirmed by our team on WhatsApp." },
+  {
+    icon: TruckIcon,
+    title: "Islandwide delivery",
+    body: "Get your order anywhere in Sri Lanka.",
+  },
+  {
+    icon: ShieldCheckIcon,
+    title: "Quality guaranteed",
+    body: "Premium materials, lasting comfort.",
+  },
+  {
+    icon: LayersIcon,
+    title: "Custom designs",
+    body: "Your style, your design, your ORACK.",
+  },
+  {
+    icon: WhatsAppIcon,
+    title: "Real people, real chat",
+    body: "Every order is confirmed by our team on WhatsApp.",
+  },
 ];
 
 export function ValueProps() {
@@ -63,22 +91,28 @@ export function ValueProps() {
   );
 }
 
-export function Story() {
+export function Story({ image }: { image?: SiteImageView }) {
   return (
     <section id="story" aria-labelledby="story-heading" className="scroll-mt-24 overflow-hidden bg-ink text-white">
       <Container className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,460px),1fr))] items-center gap-[clamp(40px,6vw,88px)] py-[clamp(64px,8vw,112px)]">
-        <div aria-hidden="true" className="relative aspect-[5/4] overflow-hidden bg-[linear-gradient(160deg,#2b2b2a_0%,#121212_70%)]">
-          {/* Faint pattern of outlined marks, with the stacked logo on top. */}
-          <div className="absolute inset-0 grid grid-cols-4 place-items-center gap-6 p-6 text-white/[0.07]">
-            {Array.from({ length: 12 }, (_, k) => (
-              <LogoMark key={k} outline className={k % 2 ? "w-3/5" : "w-4/5"} />
-            ))}
+        {image ? (
+          <div className="relative aspect-[5/4] overflow-hidden bg-[#121212]">
+            <Image src={image.url} alt={image.alt} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
           </div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <LogoStacked className="text-[clamp(56px,7vw,96px)] text-white" />
+        ) : (
+          <div aria-hidden="true" className="relative aspect-[5/4] overflow-hidden bg-[linear-gradient(160deg,#2b2b2a_0%,#121212_70%)]">
+            {/* Faint pattern of outlined marks, with the stacked logo on top. */}
+            <div className="absolute inset-0 grid grid-cols-4 place-items-center gap-6 p-6 text-white/[0.07]">
+              {Array.from({ length: 12 }, (_, k) => (
+                <LogoMark key={k} outline className={k % 2 ? "w-3/5" : "w-4/5"} />
+              ))}
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <LogoStacked className="text-[clamp(56px,7vw,96px)] text-white" />
+            </div>
+            <span className="eyebrow absolute bottom-4.5 left-5 text-[#8f8f8f]">Est. Sri Lanka</span>
           </div>
-          <span className="eyebrow absolute bottom-4.5 left-5 text-[#8f8f8f]">Est. Sri Lanka</span>
-        </div>
+        )}
         <div className="flex flex-col gap-6">
           <SectionHeading dark id="story-heading" index="[06]" eyebrow="About us" title="The ORACK story." ghost="ORACK" note="wear it loud" />
           <p className="max-w-[540px] text-lg leading-relaxed text-[#c9c9c9]">

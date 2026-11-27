@@ -12,10 +12,7 @@ export const metadata: Metadata = { title: "Settings" };
 export default function SettingsPage() {
   return (
     <>
-      <PageHeader
-        title="Settings"
-        description="Business details used across the store and in WhatsApp links."
-      />
+      <PageHeader title="Settings" description="Business details used across the store and in WhatsApp links." />
       <Suspense fallback={<PanelSkeleton />}>
         <Settings />
       </Suspense>

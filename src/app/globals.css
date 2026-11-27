@@ -207,6 +207,25 @@
     padding-left: 1.25rem;
     list-style: square;
   }
+  /* Seasonal string lights: each bulb glows and twinkles. */
+  .seasonal-bulb {
+    box-shadow: 0 0 6px 1px currentColor;
+    animation: bulb-twinkle 2.4s ease-in-out infinite;
+  }
+  @keyframes bulb-twinkle {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .seasonal-bulb {
+      animation: none;
+    }
+  }
   /* Small monospaced label. */
   .eyebrow {
     font-family: var(--font-mono);

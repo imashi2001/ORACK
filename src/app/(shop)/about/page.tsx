@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightIcon, LayersIcon, ShieldCheckIcon, SparklesIcon } from "lucide-react";
 import { LogoMark, LogoStacked } from "@/components/brand/logo";
@@ -6,6 +7,7 @@ import { Container } from "@/components/shop/container";
 import { cta } from "@/components/shop/cta";
 import { PageHero } from "@/components/shop/info-page";
 import { Reveal } from "@/components/shop/reveal";
+import { getSiteImages } from "@/features/site-images/queries";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/about" },
@@ -14,12 +16,25 @@ export const metadata: Metadata = {
 };
 
 const VALUES = [
-  { icon: SparklesIcon, title: "Minimal by design", body: "Black, white and the greys between. Clean lines and oversized fits that go with everything you own." },
-  { icon: ShieldCheckIcon, title: "Made to last", body: "Comfortable fabrics and prints that are checked before anything leaves us." },
-  { icon: LayersIcon, title: "Yours to customise", body: "Bring your own idea. We print it on a tee or hoodie, and nothing is made until you approve the quote." },
+  {
+    icon: SparklesIcon,
+    title: "Minimal by design",
+    body: "Black, white and the greys between. Clean lines and oversized fits that go with everything you own.",
+  },
+  {
+    icon: ShieldCheckIcon,
+    title: "Made to last",
+    body: "Comfortable fabrics and prints that are checked before anything leaves us.",
+  },
+  {
+    icon: LayersIcon,
+    title: "Yours to customise",
+    body: "Bring your own idea. We print it for you, and nothing is made until you approve the quote.",
+  },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const story = (await getSiteImages())["home.story"];
   return (
     <>
       <PageHero
@@ -38,16 +53,22 @@ export default function AboutPage() {
 
       <section className="bg-paper">
         <Container className="grid items-center gap-[clamp(40px,6vw,88px)] py-[clamp(56px,8vw,112px)] lg:grid-cols-2">
-          <div aria-hidden="true" className="relative aspect-[5/4] overflow-hidden bg-[linear-gradient(160deg,#2b2b2a_0%,#121212_70%)]">
-            <div className="absolute inset-0 grid grid-cols-4 place-items-center gap-6 p-6 text-white/[0.07]">
-              {Array.from({ length: 12 }, (_, k) => (
-                <LogoMark key={k} outline className={k % 2 ? "w-3/5" : "w-4/5"} />
-              ))}
+          {story ? (
+            <div className="relative aspect-[5/4] overflow-hidden bg-ink">
+              <Image src={story.url} alt={story.alt} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
             </div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <LogoStacked className="text-[clamp(56px,7vw,96px)] text-white" />
+          ) : (
+            <div aria-hidden="true" className="relative aspect-[5/4] overflow-hidden bg-[linear-gradient(160deg,#2b2b2a_0%,#121212_70%)]">
+              <div className="absolute inset-0 grid grid-cols-4 place-items-center gap-6 p-6 text-white/[0.07]">
+                {Array.from({ length: 12 }, (_, k) => (
+                  <LogoMark key={k} outline className={k % 2 ? "w-3/5" : "w-4/5"} />
+                ))}
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <LogoStacked className="text-[clamp(56px,7vw,96px)] text-white" />
+              </div>
             </div>
-          </div>
+          )}
           <div className="flex flex-col gap-5 text-lg leading-relaxed text-[#3d3d3d]">
             <h2 className="display text-[clamp(36px,4.5vw,60px)] text-ink">Our story</h2>
             <p>
@@ -55,8 +76,8 @@ export default function AboutPage() {
               talking.
             </p>
             <p>
-              Every piece is designed to be worn hard: on the street, at the shoot, everywhere in between. And when the drop doesn&apos;t have what you&apos;re picturing, our custom studio
-              prints your own design.
+              Every piece is designed to be worn hard: on the street, at the shoot, everywhere in between. And when the drop doesn&apos;t have what you&apos;re picturing, our custom studio prints your
+              own design.
             </p>
             <p>We keep buying simple too. No accounts, no card details: place your order here and confirm it with a real person on WhatsApp.</p>
           </div>

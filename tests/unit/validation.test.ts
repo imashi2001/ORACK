@@ -72,12 +72,17 @@ describe("admin validation", () => {
     expect(slugify("  Signature Logo Tee — V2!  ")).toBe("signature-logo-tee-v2");
   });
 
-  const product = { name: "Tee", slug: "tee", description: "A nice tee for tests.", categoryId: "c1", basePrice: 2500, status: "ACTIVE", isFeatured: false, isNewArrival: false, isCustomizable: false, artPrint: "chest" };
+  const product = { name: "Tee", slug: "tee", description: "A nice tee for tests.", categoryId: "c1", basePrice: 2500, discountPercent: null, status: "ACTIVE", isFeatured: false, isNewArrival: false, isCustomizable: false, artPrint: "chest" };
   it("validates products", () => {
     expect(productSchema.safeParse(product).success).toBe(true);
     expect(productSchema.safeParse({ ...product, slug: "Bad Slug" }).success).toBe(false);
     expect(productSchema.safeParse({ ...product, basePrice: -1 }).success).toBe(false);
     expect(productSchema.safeParse({ ...product, basePrice: 10.555 }).success).toBe(false);
+  });
+
+  it("accepts a whole-number discount from 1 to 90%", () => {
+    expect(productSchema.safeParse({ ...product, discountPercent: 20 }).success).toBe(true);
+    for (const bad of [0, 91, 12.5, -10]) expect(productSchema.safeParse({ ...product, discountPercent: bad }).success).toBe(false);
   });
 
   it("validates variants and upper-cases size and SKU", () => {

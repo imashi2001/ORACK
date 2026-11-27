@@ -133,7 +133,15 @@ export function ProductCard({ product, surface = "paper", priority }: { product:
           <Link href={href} className="text-sm leading-snug font-semibold underline-offset-4 hover:underline @[220px]:text-base">
             {product.name}
           </Link>
-          <span className="text-sm text-graphite @[220px]:text-[15px]">{priceLabel}</span>
+          <span className="flex flex-wrap items-baseline gap-x-2 text-sm text-graphite @[220px]:text-[15px]">
+            <span className={cn(product.discountPercent && "font-semibold text-ink")}>{priceLabel}</span>
+            {product.discountPercent && (
+              <s className="text-[13px] text-smoke">
+                <span className="sr-only">Was </span>
+                {formatLKR(product.compareAtMinPrice)}
+              </s>
+            )}
+          </span>
         </div>
         <span className="eyebrow hidden shrink-0 pt-1 text-[10px] text-smoke @[220px]:inline">
           {product.colours.length} {product.colours.length === 1 ? "colour" : "colours"}

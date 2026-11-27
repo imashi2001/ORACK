@@ -23,7 +23,7 @@ async function Categories() {
   const rows = await getPrisma().category.findMany({ orderBy: [{ sortOrder: "asc" }, { name: "asc" }], include: { _count: { select: { products: true } } } });
   return (
     <CategoryManager
-      categories={rows.map((c) => ({ id: c.id, name: c.name, slug: c.slug, description: c.description, sortOrder: c.sortOrder, isActive: c.isActive, productCount: c._count.products }))}
+      categories={rows.map((c) => ({ id: c.id, name: c.name, slug: c.slug, description: c.description, tagline: c.tagline, sortOrder: c.sortOrder, isActive: c.isActive, productCount: c._count.products }))}
     />
   );
 }

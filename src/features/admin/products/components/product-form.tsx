@@ -33,6 +33,7 @@ export function ProductForm({ product, categories }: { product?: ProductInput & 
       description: "",
       categoryId: categories[0]?.id ?? "",
       basePrice: undefined as unknown as number,
+      discountPercent: null,
       status: "DRAFT",
       isFeatured: false,
       isNewArrival: true,
@@ -108,6 +109,20 @@ export function ProductForm({ product, categories }: { product?: ProductInput & 
           </Field>
           <Field label="Base price (LKR)" htmlFor="basePrice" error={errors.basePrice?.message} hint="Variants can override this.">
             <input id="basePrice" type="number" inputMode="decimal" step="0.01" min="0" className={adminInput} aria-invalid={!!errors.basePrice} {...form.register("basePrice", { valueAsNumber: true })} />
+          </Field>
+          <Field label="Discount (%)" htmlFor="discountPercent" error={errors.discountPercent?.message} hint="Leave empty for no sale. Applies to every size and colour, and is charged at checkout.">
+            <input
+              id="discountPercent"
+              type="number"
+              inputMode="numeric"
+              step="1"
+              min="1"
+              max="90"
+              placeholder="e.g. 20"
+              className={adminInput}
+              aria-invalid={!!errors.discountPercent}
+              {...form.register("discountPercent", { setValueAs: (v) => (v === "" || v == null || Number.isNaN(Number(v)) ? null : Number(v)) })}
+            />
           </Field>
           <Field label="Status" htmlFor="status" hint="Only Active products are shown in the store.">
             <select id="status" className={adminInput} {...form.register("status")}>

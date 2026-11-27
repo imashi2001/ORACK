@@ -12,6 +12,7 @@ export interface CategoryRow {
   name: string;
   slug: string;
   description: string | null;
+  tagline: string | null;
   sortOrder: number;
   isActive: boolean;
   productCount: number;
@@ -101,6 +102,7 @@ function CategoryEditor({ category, nextSort, onDone, onCancel }: { category: Ca
     name: category?.name ?? "",
     slug: category?.slug ?? "",
     description: category?.description ?? "",
+    tagline: category?.tagline ?? "",
     sortOrder: String(category?.sortOrder ?? nextSort),
     isActive: category?.isActive ?? true,
   });
@@ -152,6 +154,11 @@ function CategoryEditor({ category, nextSort, onDone, onCancel }: { category: Ca
           <span className={adminLabel}>Description</span>
           <input className={adminInput} value={s.description} onChange={(e) => setS({ ...s, description: e.target.value })} />
         </label>
+        <label className="flex flex-col gap-1.5 md:col-span-2">
+          <span className={adminLabel}>Homepage card line</span>
+          <input className={adminInput} value={s.tagline} maxLength={80} placeholder="Essential fits for every style." onChange={(e) => setS({ ...s, tagline: e.target.value })} />
+          <span className="text-xs text-smoke">Short line on this category&apos;s homepage card. Change the card photo in Homepage.</span>
+        </label>
         <label className="flex flex-col gap-1.5">
           <span className={adminLabel}>Sort order</span>
           <input type="number" min={0} className={adminInput} value={s.sortOrder} onChange={(e) => setS({ ...s, sortOrder: e.target.value })} />
@@ -159,6 +166,7 @@ function CategoryEditor({ category, nextSort, onDone, onCancel }: { category: Ca
         <label className="flex items-center gap-2.5 self-end pb-3 text-sm">
           <input type="checkbox" className="size-4 accent-ink" checked={s.isActive} onChange={(e) => setS({ ...s, isActive: e.target.checked })} />
           Visible in the store
+          <span className="text-xs text-smoke">(untick to pause: hides its menu link, homepage card and products)</span>
         </label>
         <div className="flex items-center gap-3 md:col-span-2">
           <button type="submit" disabled={pending} className={adminButton()}>

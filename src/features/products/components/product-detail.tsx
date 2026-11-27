@@ -172,9 +172,19 @@ export function ProductDetail({ product }: { product: Product }) {
         <div className="flex flex-col gap-3.5">
           <span className="eyebrow text-smoke">{product.category.name}</span>
           <h1 className="display text-[clamp(52px,5.5vw,80px)]">{product.name}</h1>
-          <div className="flex items-baseline gap-3.5">
+          <div className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
             <span className="text-2xl font-bold">{formatLKR(unitPrice)}</span>
-            <span className="text-[13px] text-smoke">Price in LKR</span>
+            {product.discountPercent ? (
+              <>
+                <s className="text-lg text-smoke">
+                  <span className="sr-only">Was </span>
+                  {formatLKR(selected?.compareAtPrice ?? product.compareAtMinPrice)}
+                </s>
+                <span className="bg-ink px-2 py-0.5 font-mono text-[12px] font-bold tracking-wider text-white">SAVE {product.discountPercent}%</span>
+              </>
+            ) : (
+              <span className="text-[13px] text-smoke">Price in LKR</span>
+            )}
           </div>
           <p className="text-base leading-relaxed whitespace-pre-line text-graphite">{product.description}</p>
         </div>

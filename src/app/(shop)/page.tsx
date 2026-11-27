@@ -11,7 +11,8 @@ import { SectionHeading } from "@/components/shop/street";
 import { Marquee } from "@/features/home/components/marquee";
 import { FeaturedCollection } from "@/features/products/components/featured-collection";
 import { ProductCard } from "@/features/products/components/product-card";
-import { getCategories, getFeaturedProducts, getNewArrivals, getProducts } from "@/features/products/queries";
+import { getCategories, getFeaturedProducts, getNewArrivals, getProducts, getShopCategories } from "@/features/products/queries";
+import { getSiteImages } from "@/features/site-images/queries";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
 
@@ -19,13 +20,21 @@ import { ArrowRightIcon } from "lucide-react";
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default async function HomePage() {
-  const [featured, newArrivals, all, categories, heroSlides] = await Promise.all([getFeaturedProducts(), getNewArrivals(), getProducts(), getCategories(), getHeroSlides()]);
+  const [featured, newArrivals, all, categories, heroSlides, shopCategories, images] = await Promise.all([
+    getFeaturedProducts(),
+    getNewArrivals(),
+    getProducts(),
+    getCategories(),
+    getHeroSlides(),
+    getShopCategories(),
+    getSiteImages(),
+  ]);
 
   return (
     <>
       <Hero slides={heroSlides} />
       <Marquee />
-      <CategoryTiles />
+      <CategoryTiles categories={shopCategories} images={images} />
 
       <section aria-labelledby="featured-heading" className="overflow-hidden bg-paper py-[clamp(64px,8vw,112px)]">
         <Container>
@@ -33,7 +42,7 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      <CustomizeBand />
+      <CustomizeBand image={images["home.customize-band"]} />
 
       <Lookbook products={[...featured, ...newArrivals.filter((n) => !featured.some((f) => f.id === n.id))]} />
 
@@ -57,7 +66,7 @@ export default async function HomePage() {
 
       <HowOrdering />
       <ValueProps />
-      <Story />
+      <Story image={images["home.story"]} />
     </>
   );
 }

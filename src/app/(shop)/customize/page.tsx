@@ -7,7 +7,7 @@ import { getCustomizableProducts } from "@/features/products/queries";
 export const metadata: Metadata = {
   alternates: { canonical: "/customize" },
   title: "Custom designs",
-  description: "Request a custom ORACK T-shirt or hoodie. Upload your design and get a quote on WhatsApp.",
+  description: "Request a custom ORACK T-shirt. Upload your design and get a quote on WhatsApp.",
 };
 
 export default function CustomizePage({ searchParams }: PageProps<"/customize">) {

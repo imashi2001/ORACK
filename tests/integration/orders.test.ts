@@ -95,4 +95,23 @@ describe.skipIf(!hasTestDb)("createOrder (real database)", () => {
     expect(item).toMatchObject({ productName: "Test Tee", size: "M", colorName: "Black", productId: null, variantId: null });
     expect(item.unitPrice.toNumber()).toBe(2500);
   });
+
+  it("charges the product's discount, worked out on the server", async () => {
+    const { product, m, l } = await seedCatalog();
+    await getPrisma().product.update({ where: { id: product.id }, data: { discountPercent: 20 } });
+    const res = await createOrder({ ...customer, idempotencyKey: uuid(40), items: [{ variantId: m.id, quantity: 1 }, { variantId: l.id, quantity: 1 }] });
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    // 2500 → 2000 and the 2800 variant override → 2240
+    expect(res.order.lines.map((x) => x.unitPrice).sort()).toEqual([2000, 2240]);
+    expect(res.order.total).toBe(4240);
+  });
+
+  it("refuses items from a hidden (paused) category", async () => {
+    const { category, m } = await seedCatalog();
+    await getPrisma().category.update({ where: { id: category.id }, data: { isActive: false } });
+    const res = await createOrder({ ...customer, idempotencyKey: uuid(41), items: [{ variantId: m.id, quantity: 1 }] });
+    expect(res.ok).toBe(false);
+    expect((await getPrisma().productVariant.findUniqueOrThrow({ where: { id: m.id } })).stockQuantity).toBe(5);
+  });
 });

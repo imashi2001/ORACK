@@ -4,17 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { ArrowRightIcon, MenuIcon, SearchIcon, ShoppingBagIcon, XIcon } from "lucide-react";
-import { mainNav } from "@/config/site";
+import type { NavItem } from "@/config/site";
 import { useCart } from "@/features/cart/cart-provider";
 import { FacebookIcon, InstagramIcon, MailIcon, TikTokIcon, WhatsAppIcon } from "@/components/shop/icons";
 import { Container } from "@/components/shop/container";
 import { cn } from "@/lib/utils";
 import { LogoHorizontal } from "@/components/brand/logo";
+import { StringLights } from "@/features/seasonal/components/string-lights";
 
 const iconBtn =
   "relative inline-flex size-11 items-center justify-center rounded-full transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
-const QUICK_SEARCHES = ["Oversized tee", "Hoodie", "Black", "White", "Graphic"];
+const BASE_SEARCHES = ["Oversized", "Black", "White", "Graphic"];
 
 export interface HeaderSocials {
   instagram: string | null;
@@ -29,10 +30,10 @@ function isActive(pathname: string | null, href: string) {
 }
 
 /** Desktop links. Highlighting reads the pathname (request data), so it streams in behind Suspense. */
-function PrimaryLinks({ pathname }: { pathname: string | null }) {
+function PrimaryLinks({ pathname, nav }: { pathname: string | null; nav: NavItem[] }) {
   return (
     <>
-      {mainNav.map((item) => (
+      {nav.map((item) => (
         <Link
           key={item.label}
           href={item.href}
@@ -46,8 +47,8 @@ function PrimaryLinks({ pathname }: { pathname: string | null }) {
   );
 }
 
-function ActivePrimaryLinks() {
-  return <PrimaryLinks pathname={usePathname()} />;
+function ActivePrimaryLinks({ nav }: { nav: NavItem[] }) {
+  return <PrimaryLinks pathname={usePathname()} nav={nav} />;
 }
 
 /**
@@ -55,7 +56,22 @@ function ActivePrimaryLinks() {
  * - On the homepage it starts transparent over the hero photo (CSS `over-hero` variant, so there is no flash before JS),
  *   and turns into a solid, blurred bar once you scroll. Other pages always get the solid bar.
  */
-export function SiteHeader({ whatsappUrl, socials }: { whatsappUrl: string; socials: HeaderSocials }) {
+export function SiteHeader({
+  whatsappUrl,
+  socials,
+  nav,
+  categories,
+  lights,
+}: {
+  whatsappUrl: string;
+  socials: HeaderSocials;
+  nav: NavItem[];
+  categories: string[];
+  /** Seasonal string lights along the bottom edge. */
+  lights?: "warm" | "colour" | null;
+}) {
+  // Popular searches: the visible categories first, then colours and styles.
+  const quickSearches = [...categories, ...BASE_SEARCHES].slice(0, 6);
   const { count, setOpen } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -136,8 +152,8 @@ export function SiteHeader({ whatsappUrl, socials }: { whatsappUrl: string; soci
         </div>
 
         <nav aria-label="Primary" className="hidden items-center gap-8 text-[12px] font-semibold tracking-[0.22em] uppercase lg:flex">
-          <Suspense fallback={<PrimaryLinks pathname={null} />}>
-            <ActivePrimaryLinks />
+          <Suspense fallback={<PrimaryLinks pathname={null} nav={nav} />}>
+            <ActivePrimaryLinks nav={nav} />
           </Suspense>
         </nav>
 
@@ -170,6 +186,8 @@ export function SiteHeader({ whatsappUrl, socials }: { whatsappUrl: string; soci
         </div>
       </Container>
 
+      {lights && !panelOpen && <StringLights mode={lights} />}
+
       {searchOpen && (
         <div id="site-search-panel" className="animate-in fade-in slide-in-from-top-2 absolute inset-x-0 top-full border-y border-white/10 bg-ink duration-200">
           <Container className="flex flex-col gap-5 py-6">
@@ -184,7 +202,7 @@ export function SiteHeader({ whatsappUrl, socials }: { whatsappUrl: string; soci
                 type="search"
                 autoFocus
                 autoComplete="off"
-                placeholder="Search tees, hoodies, colours…"
+                placeholder="Search tees, colours, prints…"
                 className="h-14 flex-1 border-b-[1.5px] border-white/20 bg-transparent text-xl font-medium text-white outline-none placeholder:text-white/40 focus:border-white sm:text-2xl"
               />
               <button type="submit" className={cn(iconBtn, "border border-white/20")} aria-label="Submit search">
@@ -193,7 +211,7 @@ export function SiteHeader({ whatsappUrl, socials }: { whatsappUrl: string; soci
             </form>
             <div className="flex flex-wrap items-center gap-2">
               <span className="eyebrow mr-2 text-white/50">Popular</span>
-              {QUICK_SEARCHES.map((q) => (
+              {quickSearches.map((q) => (
                 <Link
                   key={q}
                   href={`/products?q=${encodeURIComponent(q)}`}
@@ -209,17 +227,16 @@ export function SiteHeader({ whatsappUrl, socials }: { whatsappUrl: string; soci
       )}
 
       {menuOpen && (
-        <div
-          id="mobile-menu"
-          className="animate-in fade-in absolute inset-x-0 top-full flex h-[calc(100dvh-4.5rem)] flex-col overflow-y-auto border-t border-white/10 bg-ink duration-200 lg:hidden"
-        >
+        <div id="mobile-menu" className="animate-in fade-in absolute inset-x-0 top-full flex h-[calc(100dvh-4.5rem)] flex-col overflow-y-auto border-t border-white/10 bg-ink duration-200 lg:hidden">
           <Container className="flex flex-1 flex-col justify-between gap-10 pt-6 pb-28">
             <nav aria-label="Mobile">
               <ul className="flex flex-col">
-                {mainNav.map((item, i) => (
+                {nav.map((item, i) => (
                   <li key={item.label} className="animate-in fade-in slide-in-from-left-4 fill-mode-both border-b border-white/10 duration-500" style={{ animationDelay: `${60 + i * 45}ms` }}>
                     <Link href={item.href} onClick={closeAll} className="group flex items-baseline gap-4 py-3.5">
-                      <span aria-hidden="true" className="eyebrow w-6 text-white/40">{String(i + 1).padStart(2, "0")}</span>
+                      <span aria-hidden="true" className="eyebrow w-6 text-white/40">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
                       <span className="street text-[40px] leading-none transition-transform group-hover:translate-x-1.5">{item.label}</span>
                       <ArrowRightIcon aria-hidden="true" className="ml-auto size-5 self-center text-white/40 transition-transform group-hover:translate-x-1 group-hover:text-white" />
                     </Link>
@@ -241,7 +258,13 @@ export function SiteHeader({ whatsappUrl, socials }: { whatsappUrl: string; soci
                 <ul className="flex gap-2">
                   {socialLinks.map(({ label, href, icon: Icon }) => (
                     <li key={label}>
-                      <a href={href} target="_blank" rel="noopener noreferrer" aria-label={`ORACK on ${label}`} className="flex size-11 items-center justify-center border border-white/20 text-white/80 hover:border-white hover:text-white">
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`ORACK on ${label}`}
+                        className="flex size-11 items-center justify-center border border-white/20 text-white/80 hover:border-white hover:text-white"
+                      >
                         <Icon className="size-[18px]" />
                       </a>
                     </li>

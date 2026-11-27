@@ -7,7 +7,7 @@ import { getCategories, getProducts } from "@/features/products/queries";
 export const metadata: Metadata = {
   alternates: { canonical: "/products" },
   title: "Shop",
-  description: "Oversized T-shirts and hoodies in black, white, ash and charcoal.",
+  description: "Oversized ORACK streetwear in black, white and grey. Order in minutes on WhatsApp.",
 };
 
 export default async function ProductsPage() {

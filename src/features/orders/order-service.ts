@@ -1,4 +1,5 @@
 import "server-only";
+import { discountedPrice } from "@/features/products/pricing";
 import { Prisma } from "@/generated/prisma/client";
 import { getPrisma } from "@/lib/prisma";
 import { generateReference } from "@/lib/reference";
@@ -69,21 +70,22 @@ export async function createOrder(input: PlaceOrderInput & { customerPhone: stri
 
   const variants = await prisma.productVariant.findMany({
     where: { id: { in: [...merged.keys()] } },
-    include: { product: { select: { id: true, name: true, basePrice: true, status: true } } },
+    include: { product: { select: { id: true, name: true, basePrice: true, discountPercent: true, status: true, category: { select: { isActive: true } } } } },
   });
 
   const lines: PricedLine[] = [];
   const stockIssues: StockIssue[] = [];
   for (const [variantId, quantity] of merged) {
     const v = variants.find((x) => x.id === variantId);
-    if (!v || !v.isActive || v.product.status !== "ACTIVE") {
+    // Hidden categories (e.g. a paused line) can't be ordered either, even from an old bag.
+    if (!v || !v.isActive || v.product.status !== "ACTIVE" || !v.product.category.isActive) {
       return { ok: false, error: "One of the items in your bag is no longer available. Please remove it and try again." };
     }
     if (v.stockQuantity < quantity) {
       stockIssues.push({ variantId, productName: `${v.product.name} (${v.colorName} / ${v.size})`, requested: quantity, available: v.stockQuantity });
       continue;
     }
-    const unitPrice = (v.price ?? v.product.basePrice).toNumber();
+    const unitPrice = discountedPrice((v.price ?? v.product.basePrice).toNumber(), v.product.discountPercent);
     lines.push({
       variantId,
       productId: v.product.id,

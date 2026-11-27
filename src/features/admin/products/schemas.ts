@@ -21,6 +21,13 @@ export const productSchema = z.object({
   description: z.string().trim().min(10, "Add a short description (10+ characters)").max(4000),
   categoryId: z.string().min(1, "Choose a category"),
   basePrice: price,
+  /** Whole percent off every variant, or null for no discount. */
+  discountPercent: z
+    .number({ error: "Enter a whole number" })
+    .int("Whole numbers only")
+    .min(1, "At least 1%")
+    .max(90, "At most 90%")
+    .nullable(),
   status: z.enum(["DRAFT", "ACTIVE", "INACTIVE"]),
   isFeatured: z.boolean(),
   isNewArrival: z.boolean(),

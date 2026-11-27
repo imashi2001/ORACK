@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { discountedPrice } from "@/features/products/pricing";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -109,7 +110,19 @@ async function ProductsTable({ searchParams }: Pick<PageProps<"/admin/products">
                       </Link>
                     </td>
                     <td className="px-4 py-3">{p.category}</td>
-                    <td className="px-4 py-3">{formatLKR(p.basePrice)}</td>
+                    <td className="px-4 py-3">
+                      {p.discountPercent ? (
+                        <span className="flex flex-col gap-1">
+                          <span className="flex items-center gap-1.5">
+                            <span className="font-semibold">{formatLKR(discountedPrice(p.basePrice, p.discountPercent))}</span>
+                            <Badge tone="dark">-{p.discountPercent}%</Badge>
+                          </span>
+                          <s className="text-xs text-smoke">{formatLKR(p.basePrice)}</s>
+                        </span>
+                      ) : (
+                        formatLKR(p.basePrice)
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       {p.variantCount === 0 ? <Badge tone="red">No variants</Badge> : p.totalStock === 0 ? <Badge tone="red">Sold out</Badge> : `${p.totalStock} · ${p.variantCount} variants`}
                     </td>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useState } from "react";
-import { FolderTreeIcon, ImageIcon, LayoutDashboardIcon, MenuIcon, PaletteIcon, PackageIcon, SettingsIcon, ShoppingCartIcon, XIcon } from "lucide-react";
+import { FolderTreeIcon, ImageIcon, SnowflakeIcon, LayoutDashboardIcon, MenuIcon, PaletteIcon, PackageIcon, SettingsIcon, ShoppingCartIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogoHorizontal } from "@/components/brand/logo";
 
@@ -14,6 +14,7 @@ const NAV = [
   { href: "/admin/products", label: "Products", icon: PackageIcon },
   { href: "/admin/categories", label: "Categories", icon: FolderTreeIcon },
   { href: "/admin/homepage", label: "Homepage", icon: ImageIcon },
+  { href: "/admin/seasonal", label: "Seasonal", icon: SnowflakeIcon },
   { href: "/admin/settings", label: "Settings", icon: SettingsIcon },
 ];
 

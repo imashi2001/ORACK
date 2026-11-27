@@ -2,6 +2,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import type { Prisma } from "@/generated/prisma/client";
 import { getPrisma } from "@/lib/prisma";
+import { discountedPrice, validDiscount } from "./pricing";
 import { compareSizes, sortProducts } from "./sort";
 import { toneFromHex } from "./tones";
 import { PRINT_STYLES, type CategoryRef, type ColourOption, type PrintStyle, type Product } from "./types";
@@ -23,6 +24,7 @@ type ProductRow = Prisma.ProductGetPayload<{ include: typeof productInclude }>;
 
 function toProduct(row: ProductRow): Product {
   const basePrice = row.basePrice.toNumber();
+  const discountPercent = validDiscount(row.discountPercent);
   const colours: ColourOption[] = [];
   for (const v of row.variants) {
     if (!colours.some((c) => c.name === v.colorName)) colours.push({ name: v.colorName, hex: v.colorHex, tone: toneFromHex(v.colorHex) });
@@ -32,7 +34,8 @@ function toProduct(row: ProductRow): Product {
     sku: v.sku,
     size: v.size,
     colorName: v.colorName,
-    price: v.price?.toNumber() ?? basePrice,
+    price: discountedPrice(v.price?.toNumber() ?? basePrice, discountPercent),
+    compareAtPrice: v.price?.toNumber() ?? basePrice,
     stock: v.stockQuantity,
   }));
   const sizes = [...new Set(variants.map((v) => v.size))].sort(compareSizes);
@@ -46,13 +49,15 @@ function toProduct(row: ProductRow): Product {
     category: row.category,
     kind: row.category.slug.includes("hood") ? "hoodie" : "tee",
     print,
-    price: basePrice,
-    minPrice: variants.length ? Math.min(...variants.map((v) => v.price)) : basePrice,
+    price: discountedPrice(basePrice, discountPercent),
+    minPrice: variants.length ? Math.min(...variants.map((v) => v.price)) : discountedPrice(basePrice, discountPercent),
+    compareAtMinPrice: variants.length ? Math.min(...variants.map((v) => v.compareAtPrice)) : basePrice,
+    discountPercent,
     colours,
     sizes,
     variants,
     images: row.images.map((i) => ({ id: i.id, url: i.url, alt: i.altText, colorName: i.colorName })),
-    tag: row.isNewArrival ? "New" : row.isCustomizable ? "Customizable" : undefined,
+    tag: discountPercent ? `-${discountPercent}%` : row.isNewArrival ? "New" : row.isCustomizable ? "Customizable" : undefined,
     isFeatured: row.isFeatured,
     isNewArrival: row.isNewArrival,
     isCustomizable: row.isCustomizable,
@@ -78,6 +83,28 @@ export async function getCategories(): Promise<CategoryRef[]> {
   cacheTag(CATALOG_TAG);
   cacheLife("hours");
   return getPrisma().category.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }], select: { slug: true, name: true } });
+}
+
+export interface HomeCategory {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string | null;
+  productCount: number;
+}
+
+/** Visible categories that have something to buy, for the homepage cards and navigation. */
+export async function getShopCategories(): Promise<HomeCategory[]> {
+  "use cache";
+  cacheTag(CATALOG_TAG);
+  cacheLife("hours");
+  const [categories, products] = await Promise.all([
+    getPrisma().category.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }], select: { id: true, slug: true, name: true, tagline: true } }),
+    loadActiveProducts(),
+  ]);
+  return categories
+    .map((c) => ({ ...c, productCount: products.filter((p) => p.category.slug === c.slug).length }))
+    .filter((c) => c.productCount > 0);
 }
 
 export async function getProducts(): Promise<Product[]> {

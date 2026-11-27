@@ -7,7 +7,7 @@
 export const siteConfig = {
   name: "ORACK",
   tagline: "Live Bold. Wear ORACK",
-  description: "ORACK streetwear. Oversized tees, hoodies and custom prints in black and white. Live Bold. Wear ORACK. Order in minutes via WhatsApp.",
+  description: "ORACK streetwear. Oversized tees and custom prints in black and white. Live Bold. Wear ORACK. Order in minutes via WhatsApp.",
   // Set NEXT_PUBLIC_SITE_URL in Vercel (e.g. https://www.orackclothing.com). Falls back to Vercel's production domain, then localhost.
   url:
     process.env.NEXT_PUBLIC_SITE_URL ||
@@ -22,11 +22,18 @@ export const siteConfig = {
   announcement: ["Islandwide delivery across Sri Lanka", "Order in minutes via WhatsApp", "Custom prints on request"],
 } as const;
 
-export const mainNav = [
-  { label: "Home", href: "/" },
-  { label: "T-Shirts", href: "/products?category=t-shirts" },
-  { label: "Hoodies", href: "/products?category=hoodies" },
-  { label: "New In", href: "/products?sort=newest" },
-  { label: "Customize", href: "/customize" },
-  { label: "About", href: "/about" },
-] as const;
+export interface NavItem {
+  label: string;
+  href: string;
+}
+
+/** Main navigation. Category links follow the visible categories in Admin → Categories. */
+export function buildNav(categories: { slug: string; name: string }[]): NavItem[] {
+  return [
+    { label: "Home", href: "/" },
+    ...categories.map((c) => ({ label: c.name, href: `/products?category=${c.slug}` })),
+    { label: "New In", href: "/products?sort=newest" },
+    { label: "Customize", href: "/customize" },
+    { label: "About", href: "/about" },
+  ];
+}

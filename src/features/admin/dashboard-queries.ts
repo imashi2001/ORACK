@@ -17,7 +17,7 @@ export async function getDashboardData() {
     prisma.order.findMany({ orderBy: { createdAt: "desc" }, take: 6, select: { id: true, reference: true, customerName: true, total: true, status: true, paymentStatus: true, createdAt: true } }),
     prisma.customizationRequest.findMany({ orderBy: { createdAt: "desc" }, take: 5, select: { id: true, reference: true, customerName: true, productNameSnapshot: true, status: true, createdAt: true } }),
     prisma.productVariant.findMany({
-      where: { isActive: true, stockQuantity: { lte: LOW_STOCK_THRESHOLD }, product: { status: "ACTIVE" } },
+      where: { isActive: true, stockQuantity: { lte: LOW_STOCK_THRESHOLD }, product: { status: "ACTIVE", category: { isActive: true } } },
       orderBy: { stockQuantity: "asc" },
       take: 8,
       select: { id: true, size: true, colorName: true, stockQuantity: true, product: { select: { id: true, name: true } } },
