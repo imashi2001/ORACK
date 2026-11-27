@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps<"/products/[slug]">
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) return { title: "Product not found" };
-  return { title: product.name, description: product.description };
+  return { title: product.name, description: product.description, alternates: { canonical: `/products/${product.slug}` } };
 }
 
 export default function ProductPage({ params }: PageProps<"/products/[slug]">) {

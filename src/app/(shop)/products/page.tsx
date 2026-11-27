@@ -5,6 +5,7 @@ import { ProductBrowser } from "@/features/products/components/product-browser";
 import { getCategories, getProducts } from "@/features/products/queries";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/products" },
   title: "Shop",
   description: "Oversized T-shirts and hoodies in black, white, ash and charcoal.",
 };

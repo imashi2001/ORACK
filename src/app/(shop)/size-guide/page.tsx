@@ -6,6 +6,7 @@ import { hasMeasurements, SIZE_GUIDE_KINDS } from "@/features/settings/size-guid
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/size-guide" },
   title: "Size guide",
   description: "ORACK T-shirt and hoodie measurements, how to measure, and how our oversized fits are meant to sit.",
 };

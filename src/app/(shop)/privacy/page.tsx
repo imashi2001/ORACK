@@ -3,6 +3,7 @@ import { PageBody, PageHero, Section } from "@/components/shop/info-page";
 import { getPublicSettings } from "@/features/settings/queries";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/privacy" },
   title: "Privacy policy",
   description: "What personal information ORACK collects when you order or request a custom design, and how it's used and protected.",
 };

@@ -8,6 +8,7 @@ import { getPublicSettings } from "@/features/settings/queries";
 import { buildWhatsAppUrl, formatWhatsAppDisplay } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/contact" },
   title: "Contact",
   description: "Talk to ORACK on WhatsApp, by email, or on Instagram, TikTok and Facebook.",
 };

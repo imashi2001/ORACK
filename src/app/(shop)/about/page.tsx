@@ -8,6 +8,7 @@ import { PageHero } from "@/components/shop/info-page";
 import { Reveal } from "@/components/shop/reveal";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/about" },
   title: "About",
   description: "ORACK is black-and-white streetwear built for self-expression. Live Bold. Wear ORACK.",
 };

@@ -8,7 +8,10 @@ export const siteConfig = {
   name: "ORACK",
   tagline: "Live Bold. Wear ORACK",
   description: "ORACK streetwear. Oversized tees, hoodies and custom prints in black and white. Live Bold. Wear ORACK. Order in minutes via WhatsApp.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  // Set NEXT_PUBLIC_SITE_URL in Vercel (e.g. https://www.orackclothing.com). Falls back to Vercel's production domain, then localhost.
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000"),
   whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "94761889266",
   contactEmail: "onlyorack@gmail.com",
   social: {

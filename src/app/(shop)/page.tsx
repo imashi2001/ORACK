@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Container } from "@/components/shop/container";
 import { CategoryTiles } from "@/features/home/components/category-tiles";
 import { CustomizeBand } from "@/features/home/components/customize-band";
@@ -13,6 +14,9 @@ import { ProductCard } from "@/features/products/components/product-card";
 import { getCategories, getFeaturedProducts, getNewArrivals, getProducts } from "@/features/products/queries";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
+
+/** The one true address of each page, so copies (e.g. the vercel.app URL) aren't indexed separately. */
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default async function HomePage() {
   const [featured, newArrivals, all, categories, heroSlides] = await Promise.all([getFeaturedProducts(), getNewArrivals(), getProducts(), getCategories(), getHeroSlides()]);

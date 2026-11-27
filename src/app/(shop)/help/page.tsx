@@ -9,6 +9,7 @@ import { getPublicSettings } from "@/features/settings/queries";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/help" },
   title: "Help & FAQ",
   description: "Answers about ordering, payment, delivery, sizing, returns and custom designs at ORACK.",
 };

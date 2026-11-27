@@ -5,6 +5,7 @@ import { CustomizeForm } from "@/features/customization/components/customize-for
 import { getCustomizableProducts } from "@/features/products/queries";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/customize" },
   title: "Custom designs",
   description: "Request a custom ORACK T-shirt or hoodie. Upload your design and get a quote on WhatsApp.",
 };

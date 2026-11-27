@@ -5,6 +5,7 @@ import { getPublicSettings } from "@/features/settings/queries";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/delivery-returns" },
   title: "Delivery & returns",
   description: "Islandwide delivery across Sri Lanka, and what to do if something isn't right with your ORACK order.",
 };

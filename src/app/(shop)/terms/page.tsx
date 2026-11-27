@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PageBody, PageHero, Section } from "@/components/shop/info-page";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/terms" },
   title: "Terms of service",
   description: "The terms for ordering from ORACK and requesting custom designs.",
 };
