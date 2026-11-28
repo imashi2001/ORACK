@@ -55,7 +55,10 @@ export function SiteFooter({ whatsappUrl, settings, categories }: { whatsappUrl:
           </div>
           <nav aria-label="Shop" className="flex flex-col gap-3 text-sm">
             <span className="eyebrow mb-1.5 text-[#8f8f8f]">Shop</span>
-            {categories.map((c) => (
+            <Link className={footerLink} href="/products">
+              All products
+            </Link>
+            {categories.slice(0, 6).map((c) => (
               <Link key={c.slug} className={footerLink} href={`/products?category=${c.slug}`}>
                 {c.name}
               </Link>

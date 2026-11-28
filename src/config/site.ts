@@ -27,13 +27,24 @@ export interface NavItem {
   href: string;
 }
 
-/** Main navigation. Category links follow the visible categories in Admin → Categories. */
-export function buildNav(categories: { slug: string; name: string }[]): NavItem[] {
-  return [
-    { label: "Home", href: "/" },
-    ...categories.map((c) => ({ label: c.name, href: `/products?category=${c.slug}` })),
-    { label: "New In", href: "/products?sort=newest" },
-    { label: "Customize", href: "/customize" },
-    { label: "About", href: "/about" },
-  ];
+/** A category as the menus show it. */
+export interface NavCategory {
+  slug: string;
+  name: string;
+  productCount: number;
+  image?: { url: string; alt: string };
 }
+
+/**
+ * Main navigation. Categories don't get a top-level link each (the bar would fill up as categories are added);
+ * they live in the Shop menu instead, see SiteHeader.
+ */
+export const mainNav: NavItem[] = [
+  { label: "Home", href: "/" },
+  { label: "Shop", href: "/products" },
+  { label: "New In", href: "/products?sort=newest" },
+  { label: "Customize", href: "/customize" },
+  { label: "About", href: "/about" },
+];
+
+export const SHOP_HREF = "/products";

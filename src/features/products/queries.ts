@@ -5,7 +5,7 @@ import { getPrisma } from "@/lib/prisma";
 import { discountedPrice, validDiscount } from "./pricing";
 import { compareSizes, sortProducts } from "./sort";
 import { toneFromHex } from "./tones";
-import { PRINT_STYLES, type CategoryRef, type ColourOption, type PrintStyle, type Product } from "./types";
+import { PRINT_STYLES, type CategoryRef, type ColourOption, type GarmentKind, type PrintStyle, type Product } from "./types";
 
 /**
  * Storefront catalogue reads. Cached across requests and tagged so admin edits
@@ -91,6 +91,10 @@ export interface HomeCategory {
   name: string;
   tagline: string | null;
   productCount: number;
+  /** A product photo from the category, used when no card photo is uploaded in Admin → Homepage. */
+  cover: { url: string; alt: string } | null;
+  /** For the drawn fallback when the category has no photos at all. */
+  art: { kind: GarmentKind; print: PrintStyle };
 }
 
 /** Visible categories that have something to buy, for the homepage cards and navigation. */
@@ -103,7 +107,20 @@ export async function getShopCategories(): Promise<HomeCategory[]> {
     loadActiveProducts(),
   ]);
   return categories
-    .map((c) => ({ ...c, productCount: products.filter((p) => p.category.slug === c.slug).length }))
+    .map((c) => {
+      const inCategory = sortProducts(
+        products.filter((p) => p.category.slug === c.slug),
+        "featured",
+      );
+      const withPhoto = inCategory.find((p) => p.images.length > 0);
+      const first = inCategory[0];
+      return {
+        ...c,
+        productCount: inCategory.length,
+        cover: withPhoto ? { url: withPhoto.images[0].url, alt: withPhoto.images[0].alt || withPhoto.name } : null,
+        art: { kind: first?.kind ?? "tee", print: first?.print ?? "chest" },
+      };
+    })
     .filter((c) => c.productCount > 0);
 }
 

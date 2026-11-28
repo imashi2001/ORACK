@@ -155,6 +155,8 @@
     font-style: italic;
     text-transform: uppercase;
     letter-spacing: -0.01em;
+    /* The condensed italic face has a very narrow space; open it up so words don't run together. */
+    word-spacing: 0.1em;
     line-height: 0.86;
   }
   /* Minimal street poster type (hero). Upright, tall and tight. */

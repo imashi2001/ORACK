@@ -1,134 +1,175 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRightIcon } from "lucide-react";
+import { ArrowRightIcon, ArrowUpRightIcon } from "lucide-react";
 import { Reveal } from "@/components/shop/reveal";
-import { Sticker } from "@/components/shop/street";
+import { SectionHeading, Sticker } from "@/components/shop/street";
 import { GarmentArt } from "@/features/products/components/garment-art";
 import type { HomeCategory } from "@/features/products/queries";
-import type { GarmentKind, PrintStyle, Tone } from "@/features/products/types";
 import { categorySlot, type SiteImageView } from "@/features/site-images/slots";
 import { cn } from "@/lib/utils";
 
-interface Tile {
-  key: string;
-  sticker: string;
-  title: string[];
-  sub: string;
-  cta: string;
-  href: string;
-  light: boolean;
-  image?: SiteImageView;
-  art: { kind: GarmentKind; tone: Tone; print: PrintStyle };
+/** The homepage shows this many category cards at most; the rest are one tap away in the Shop menu. */
+const MAX_CARDS = 8;
+
+// Static class maps so Tailwind sees every class it needs.
+const MD_COLS = { 2: "md:grid-cols-2", 3: "md:grid-cols-3" } as const;
+const LG_COLS = { 2: "lg:grid-cols-2", 3: "lg:grid-cols-3", 4: "lg:grid-cols-4" } as const;
+const SPAN = { 1: "col-span-1", 2: "col-span-2" } as const;
+const MD_SPAN = { 1: "md:col-span-1", 2: "md:col-span-2", 3: "md:col-span-3" } as const;
+const LG_SPAN = { 1: "lg:col-span-1", 2: "lg:col-span-2", 3: "lg:col-span-3", 4: "lg:col-span-4" } as const;
+
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+/** A tagline that only repeats the category name ("Football T" on "Football") adds nothing, so it's left out. */
+function usefulTagline(name: string, tagline: string | null): string | null {
+  if (!tagline?.trim()) return null;
+  const a = norm(name);
+  const b = norm(tagline);
+  return a.includes(b) || b.includes(a) ? null : tagline.trim();
 }
 
-const DEFAULT_TAGLINE = "Essential fits for every style.";
-
 /**
- * "Shop by" cards under the hero: one per visible category that has products, then Custom designs.
- * Hide a category in Admin → Categories and its card disappears; photos come from Admin → Homepage.
+ * "Shop by category" under the hero: one card per visible category (up to MAX_CARDS), then the Custom designs card,
+ * which stretches to fill the last row so the grid always ends square.
+ * Card photo: the one uploaded in Admin → Homepage, else a photo of a product in the category, else drawn artwork.
  */
 export function CategoryTiles({ categories, images }: { categories: HomeCategory[]; images: Record<string, SiteImageView> }) {
-  const tiles: Tile[] = [
-    ...categories.map((c, i) => ({
-      key: c.id,
-      sticker: `${c.productCount} ${c.productCount === 1 ? "style" : "styles"}`,
-      title: [c.name],
-      sub: c.tagline || DEFAULT_TAGLINE,
-      cta: "Shop now",
-      href: `/products?category=${c.slug}`,
-      light: false,
-      image: images[categorySlot(c.id)],
-      art: { kind: (c.slug.includes("hood") ? "hoodie" : "tee") as GarmentKind, tone: (i % 2 ? "ash" : "black") as Tone, print: "chest" as PrintStyle },
-    })),
-    {
-      key: "custom",
-      sticker: "Studio",
-      title: ["Custom", "designs"],
-      sub: "Your design. Our craft. Get a quote on WhatsApp.",
-      cta: "Create now",
-      href: "/customize",
-      light: true,
-      image: images["home.custom-tile"],
-      art: { kind: "tee", tone: "black", print: "graphic" },
-    },
-  ];
-  const twoUp = tiles.length <= 2;
+  const shown = categories.slice(0, MAX_CARDS);
+  const n = shown.length;
+  const lgCols = Math.min(4, Math.max(2, n + 1)) as 2 | 3 | 4;
+  const mdCols = Math.min(3, lgCols) as 2 | 3;
+  const fill = (cols: number) => cols - (n % cols);
+  const span = { base: fill(2) as 1 | 2, md: fill(mdCols) as 1 | 2 | 3, lg: fill(lgCols) as 1 | 2 | 3 | 4 };
 
   return (
-    <section aria-label="Shop by category" className="bg-ink pb-3">
-      <div className={cn("mx-auto grid max-w-[1360px] gap-3 px-3 lg:px-6", twoUp ? "md:grid-cols-2" : "md:grid-cols-2 lg:grid-cols-3")}>
-        {tiles.map((t, i) => {
-          const onPhoto = !!t.image;
-          const dark = onPhoto || !t.light;
-          return (
-            <Reveal key={t.key} delay={i * 90}>
-              <Link
-                href={t.href}
-                className={cn(
-                  "group/tile relative isolate flex flex-col justify-between overflow-hidden p-7 outline-offset-[-4px] sm:p-9",
-                  twoUp ? "min-h-[420px] md:min-h-[clamp(460px,40vw,560px)]" : "min-h-100",
-                  dark ? "text-white" : "text-ink",
-                  onPhoto ? "bg-ink" : t.light ? "bg-paper" : i % 2 ? "bg-[#1b1b1b]" : "bg-[#141414]",
-                )}
-              >
-                {t.image ? (
-                  <>
-                    <Image
-                      src={t.image.url}
-                      alt={t.image.alt}
-                      fill
-                      sizes={twoUp ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"}
-                      className="-z-10 object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(.2,.7,.2,1)] group-hover/tile:scale-[1.05]"
-                    />
-                    <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(10,10,10,0.85)_0%,rgba(10,10,10,0.25)_50%,rgba(10,10,10,0.45)_100%)]" />
-                  </>
-                ) : (
-                  <GarmentArt
-                    {...t.art}
-                    shadow={false}
-                    className={cn(
-                      "absolute -z-10 transition-transform duration-700 ease-[cubic-bezier(.2,.7,.2,1)] group-hover/tile:scale-[1.06] group-hover/tile:-rotate-3",
-                      twoUp ? "-right-[4%] -bottom-[6%] w-[58%] md:w-[54%]" : "-right-[8%] -bottom-[8%] w-[66%]",
-                    )}
-                  />
-                )}
-                <span
-                  aria-hidden="true"
-                  className={cn("display pointer-events-none absolute -top-4 right-4 -z-10 text-[clamp(110px,12vw,170px)] leading-none", dark ? "text-outline" : "stroke-ghost")}
-                >
-                  0{i + 1}
-                </span>
+    <section aria-labelledby="categories-heading" className="overflow-hidden bg-ink py-[clamp(56px,7vw,104px)] text-white">
+      <div className="mx-auto flex max-w-[1360px] flex-col gap-9 px-3 sm:gap-12 lg:px-6">
+        <div className="flex flex-wrap items-end justify-between gap-6 px-1 lg:px-0">
+          <SectionHeading dark id="categories-heading" index={String(categories.length).padStart(2, "0")} eyebrow="Categories" title="Shop by category." ghost="SHOP" note="pick your vibe" />
+          <Link href="/products" className="inline-flex items-center gap-2 border-b-[1.5px] border-current pb-0.5 text-sm font-semibold hover:opacity-70">
+            Shop all products <ArrowRightIcon className="size-3.5" />
+          </Link>
+        </div>
 
-                <div className="relative flex max-w-[70%] flex-col items-start gap-3">
-                  <Sticker tone={dark ? "light" : "dark"} rotate={i % 2 ? 3 : -3}>
-                    {t.sticker}
-                  </Sticker>
-                  <h2 className={cn("display mt-2", twoUp ? "text-[clamp(52px,6vw,88px)]" : "text-[clamp(52px,4.6vw,64px)]")}>
-                    {t.title.map((line) => (
-                      <span key={line} className="block whitespace-nowrap">
-                        {line}
-                      </span>
-                    ))}
-                  </h2>
-                  <p className={cn("max-w-xs text-[15px] leading-normal", dark ? "text-white/75" : "text-[#4a4a4a]")}>{t.sub}</p>
-                </div>
-
-                <span className="relative inline-flex items-center gap-3 text-[13px] font-semibold tracking-[0.14em] uppercase">
-                  <span
-                    className={cn(
-                      "flex size-12 items-center justify-center rounded-full border-[1.5px] transition-all duration-300 group-hover/tile:rotate-45",
-                      dark ? "border-white group-hover/tile:bg-white group-hover/tile:text-ink" : "border-ink group-hover/tile:bg-ink group-hover/tile:text-white",
-                    )}
-                  >
-                    <ArrowUpRightIcon className="size-5" />
-                  </span>
-                  {t.cta}
-                </span>
-              </Link>
+        <ul className={cn("grid grid-cols-2 gap-2 sm:gap-3", MD_COLS[mdCols], LG_COLS[lgCols])}>
+          {shown.map((c, i) => (
+            <Reveal as="li" key={c.id} delay={(i % lgCols) * 80} className="min-w-0">
+              <CategoryCard category={c} index={i} image={images[categorySlot(c.id)] ?? c.cover ?? undefined} cols={lgCols} />
             </Reveal>
-          );
-        })}
+          ))}
+          <Reveal as="li" delay={(n % lgCols) * 80} className={cn("min-w-0", SPAN[span.base], MD_SPAN[span.md], LG_SPAN[span.lg])}>
+            <CustomCard image={images["home.custom-tile"]} />
+          </Reveal>
+        </ul>
       </div>
     </section>
+  );
+}
+
+function CategoryCard({ category: c, index, image, cols }: { category: HomeCategory; index: number; image?: SiteImageView; cols: number }) {
+  const tagline = usefulTagline(c.name, c.tagline);
+  const count = `${c.productCount} ${c.productCount === 1 ? "style" : "styles"}`;
+  return (
+    <Link
+      href={`/products?category=${c.slug}`}
+      className={cn(
+        "group/tile @container relative isolate flex aspect-[3/4] h-full flex-col justify-between overflow-hidden p-3.5 outline-offset-[-4px] sm:aspect-[4/5] sm:p-5",
+        cols <= 2 && "lg:aspect-auto lg:min-h-[clamp(440px,38vw,560px)]",
+        index % 2 ? "bg-[#1b1b1b]" : "bg-[#141414]",
+      )}
+    >
+      {image ? (
+        <>
+          <Image
+            src={image.url}
+            alt={image.alt || c.name}
+            fill
+            sizes={`(min-width: 1024px) ${Math.round(100 / cols)}vw, (min-width: 768px) 33vw, 50vw`}
+            className="-z-10 object-cover grayscale-[0.85] transition-[transform,filter] duration-[1200ms] ease-[cubic-bezier(.2,.7,.2,1)] group-hover/tile:scale-[1.06] group-hover/tile:grayscale-0"
+          />
+          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(10,10,10,0.92)_0%,rgba(10,10,10,0.35)_45%,rgba(10,10,10,0.15)_70%,rgba(10,10,10,0.5)_100%)]" />
+        </>
+      ) : (
+        <>
+          <GarmentArt
+            kind={c.art.kind}
+            print={c.art.print === "none" ? "chest" : c.art.print}
+            tone={index % 2 ? "ash" : "black"}
+            shadow={false}
+            className="absolute top-[14%] left-1/2 -z-10 w-[88%] -translate-x-1/2 transition-transform duration-700 ease-[cubic-bezier(.2,.7,.2,1)] group-hover/tile:scale-[1.05] group-hover/tile:-rotate-2"
+          />
+          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(10,10,10,0.95)_0%,rgba(10,10,10,0.2)_45%,transparent_70%)]" />
+        </>
+      )}
+
+      <div className="flex items-start justify-between gap-2">
+        <span aria-hidden="true" className="display text-outline text-[clamp(34px,22cqw,92px)] leading-none">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <Sticker tone="light" rotate={index % 2 ? 3 : -3} className="hidden @[200px]:inline-flex">
+          {count}
+        </Sticker>
+      </div>
+
+      <div className="flex flex-col gap-2 @[260px]:gap-3">
+        <h3 className="street text-[clamp(24px,14cqw,64px)] leading-[0.92] text-balance break-words uppercase">{c.name}</h3>
+        {tagline && <p className="hidden max-w-[34ch] text-sm leading-snug text-white/70 @[260px]:line-clamp-2">{tagline}</p>}
+        <span className="mt-1 flex items-center justify-between gap-3 border-t border-white/20 pt-2.5 text-[11px] font-semibold tracking-[0.16em] uppercase @[260px]:pt-3.5 @[260px]:text-xs">
+          <span className="@[200px]:hidden">{count}</span>
+          <span className="hidden @[200px]:inline">Shop now</span>
+          <span className="flex size-8 items-center justify-center rounded-full border-[1.5px] border-white transition-all duration-300 group-hover/tile:rotate-45 group-hover/tile:bg-white group-hover/tile:text-ink @[260px]:size-10">
+            <ArrowUpRightIcon className="size-4" />
+          </span>
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+/** Light card that stands out from the dark grid. Lays out side by side when it spans a wide row. */
+function CustomCard({ image }: { image?: SiteImageView }) {
+  return (
+    <Link href="/customize" className="group/tile @container relative isolate flex h-full min-h-[300px] overflow-hidden bg-paper text-ink outline-offset-[-4px]">
+      <div className="flex w-full flex-col @[560px]:flex-row">
+        <div className="relative z-10 flex flex-1 flex-col justify-between gap-6 p-5 sm:p-7 @[560px]:p-9">
+          <div className="flex flex-col items-start gap-3">
+            <Sticker tone="dark" rotate={-3}>
+              Studio
+            </Sticker>
+            <h3 className="display mt-1 text-[clamp(34px,12cqw,72px)] @[560px]:text-[clamp(44px,7cqw,80px)]">
+              <span className="block">Custom</span>
+              <span className="block">designs</span>
+            </h3>
+            <p className="max-w-[30ch] text-[15px] leading-normal text-[#4a4a4a]">Your design. Our craft. Send your idea and get a quote on WhatsApp.</p>
+          </div>
+          <span className="inline-flex items-center gap-3 text-[12px] font-semibold tracking-[0.14em] uppercase sm:text-[13px]">
+            <span className="flex size-11 items-center justify-center rounded-full border-[1.5px] border-ink transition-all duration-300 group-hover/tile:rotate-45 group-hover/tile:bg-ink group-hover/tile:text-white">
+              <ArrowUpRightIcon className="size-5" />
+            </span>
+            Create now
+          </span>
+        </div>
+
+        <div className="relative h-[210px] overflow-hidden @[560px]:h-auto @[560px]:flex-1">
+          {image ? (
+            <Image
+              src={image.url}
+              alt={image.alt}
+              fill
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(.2,.7,.2,1)] group-hover/tile:scale-[1.05]"
+            />
+          ) : (
+            <GarmentArt
+              kind="tee"
+              tone="black"
+              print="graphic"
+              shadow={false}
+              className="absolute top-3 left-1/2 w-[min(64%,260px)] -translate-x-1/2 @[560px]:top-auto @[560px]:-bottom-[10%] @[560px]:w-[min(80%,360px)] transition-transform duration-700 ease-[cubic-bezier(.2,.7,.2,1)] group-hover/tile:scale-[1.05] group-hover/tile:-rotate-3"
+            />
+          )}
+        </div>
+      </div>
+    </Link>
   );
 }
