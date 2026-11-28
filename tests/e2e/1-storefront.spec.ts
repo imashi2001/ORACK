@@ -12,6 +12,21 @@ test.describe("storefront", () => {
     expect(errors, `console errors: ${errors.join("\n")}`).toEqual([]);
   });
 
+  test("the header is see-through only over the homepage hero", async ({ page }) => {
+    const header = page.locator("header").first();
+    const transparent = () => header.evaluate((h) => getComputedStyle(h).backgroundColor === "rgba(0, 0, 0, 0)");
+    await page.goto("/");
+    await expect.poll(transparent).toBe(true);
+    // Next keeps the homepage mounted (hidden) after you leave it; the bar must still turn solid on the next page.
+    await page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "About" }).click();
+    await page.waitForURL("**/about");
+    await expect.poll(transparent).toBe(false);
+    await page.goBack();
+    await page.waitForURL((url) => url.pathname === "/");
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect.poll(transparent).toBe(true);
+  });
+
   test("listing filters by category, searches and sorts", async ({ page }) => {
     await page.goto("/products?category=hoodies");
     await expect(page.getByRole("heading", { level: 1, name: "Hoodies" })).toBeVisible();

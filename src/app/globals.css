@@ -4,7 +4,10 @@
 
 @custom-variant dark (&:is(.dark *));
 /* Header sitting over the homepage hero photo at the top of the page (no menu open, not scrolled). */
-@custom-variant over-hero (&:where(body:has([data-hero]) *):not([data-solid]));
+/* Transparent header over the homepage hero. Pure CSS so the first paint is right before JS loads.
+   Next keeps a page you've left in the DOM (hidden) for instant Back; the hero then sets data-hero-off on <body>
+   so other pages always get the solid bar. */
+@custom-variant over-hero (&:where(body:has([data-hero]):not([data-hero-off]) *):not([data-solid]));
 
 @theme inline {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;

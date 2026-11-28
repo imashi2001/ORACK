@@ -26,6 +26,15 @@ export function Hero({ slides }: { slides: HeroSlideView[] }) {
   const current = count ? index % count : 0;
   const running = count > 1 && playing && !hovered && !reduced;
 
+  // While this hero is on screen the header may go transparent over it. When you navigate away, Next keeps the
+  // homepage mounted but hidden (and runs this cleanup), so flag the body and the header turns solid on the next page.
+  useEffect(() => {
+    delete document.body.dataset.heroOff;
+    return () => {
+      document.body.dataset.heroOff = "";
+    };
+  }, []);
+
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const sync = () => setReduced(mq.matches);
